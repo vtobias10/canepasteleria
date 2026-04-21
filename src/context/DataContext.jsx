@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import supabase from '../lib/supabase'
-import { initialProducts, initialIngredients, initialConfig } from '../utils/initialData'
+import { initialConfig } from '../utils/initialData'
 
 const DataContext = createContext(null)
 
@@ -112,28 +112,10 @@ export function DataProvider({ children }) {
         if (prodsErr) throw prodsErr
         if (ingsErr) throw ingsErr
 
-        if (prods.length === 0) {
-          await supabase.from('products').upsert(initialProducts.map(fromProduct), { onConflict: 'id', ignoreDuplicates: true })
-          setProducts(initialProducts)
-        } else {
-          setProducts(prods.map(toProduct))
-        }
-
-        if (ings.length === 0) {
-          await supabase.from('ingredients').upsert(initialIngredients.map(fromIngredient), { onConflict: 'id', ignoreDuplicates: true })
-          setIngredients(initialIngredients)
-        } else {
-          setIngredients(ings.map(toIngredient))
-        }
-
+        setProducts(prods.map(toProduct))
+        setIngredients(ings.map(toIngredient))
         setOrders(ords ? ords.map(toOrder) : [])
-
-        if (!cfg) {
-          await supabase.from('config').upsert(fromConfig(initialConfig), { onConflict: 'id', ignoreDuplicates: true })
-          setConfigState(initialConfig)
-        } else {
-          setConfigState(toConfig(cfg))
-        }
+        setConfigState(cfg ? toConfig(cfg) : initialConfig)
       } catch (err) {
         console.error('Supabase load error:', err)
         setError(err.message ?? 'Error al conectar con la base de datos.')
