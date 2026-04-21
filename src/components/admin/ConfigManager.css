@@ -1,0 +1,181 @@
+.config-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ─── Config section ──────────────────── */
+.config-section {
+  padding: 24px;
+}
+
+.config-section-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 1.5px dashed var(--lilac-mid);
+}
+
+.config-section-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.config-section-head h3 {
+  font-size: 1.05rem;
+  margin-bottom: 2px;
+}
+
+.config-section-head p {
+  font-size: 0.82rem;
+  color: var(--text-light);
+}
+
+/* ─── Field hint ──────────────────────── */
+.field-hint {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-light);
+  margin-top: 5px;
+  line-height: 1.5;
+}
+
+/* ─── Input with prefix ───────────────── */
+.input-prefix-wrap {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid var(--lilac-mid);
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.8);
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-prefix-wrap:focus-within {
+  border-color: var(--lilac-deep);
+  box-shadow: 0 0 0 3px rgba(139, 95, 173, 0.12);
+}
+
+.input-prefix {
+  padding: 10px 12px;
+  background: rgba(212, 184, 232, 0.3);
+  color: var(--text-mid);
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-right: 1.5px solid var(--lilac-mid);
+  flex-shrink: 0;
+}
+
+.input-with-prefix {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  flex: 1;
+}
+
+.input-with-prefix:focus {
+  box-shadow: none !important;
+}
+
+/* ─── Form row ────────────────────────── */
+.form-row { display: flex; gap: 16px; }
+
+@media (max-width: 600px) {
+  .form-row { flex-direction: column; }
+}
+
+/* ─── Preview card ────────────────────── */
+.config-preview .config-section-head {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+}
+
+.preview-card {
+  background: rgba(237, 224, 247, 0.4);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  border: 1px dashed var(--lilac-mid);
+}
+
+.preview-logo {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.9);
+  box-shadow: 0 2px 12px rgba(139,95,173,0.15);
+  margin-bottom: 4px;
+}
+
+.preview-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  color: var(--text-dark);
+  font-weight: 400;
+}
+
+.preview-tagline {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--text-mid);
+}
+
+.preview-desc {
+  font-size: 0.82rem;
+  color: var(--text-mid);
+  line-height: 1.5;
+  max-width: 360px;
+}
+
+.preview-social {
+  display: flex;
+  gap: 16px;
+  font-size: 0.78rem;
+  color: var(--lilac-deep);
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+/* ─── Save bar ────────────────────────── */
+.config-save-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 0 8px;
+}
+
+.config-save-btn {
+  padding: 12px 32px;
+  font-size: 0.95rem;
+}
+
+.save-label {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #2d6b2d;
+}
+
+/* ─── Save success toast ──────────────── */
+.save-success {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: #c8f0c8;
+  color: #2d6b2d;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1.5px solid #a0d8a0;
+  animation: fadeIn 0.3s ease;
+}

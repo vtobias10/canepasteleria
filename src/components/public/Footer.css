@@ -1,0 +1,35 @@
+.site-footer {
+  padding: 28px 24px;
+  text-align: center;
+  background: rgba(212, 184, 232, 0.3);
+  border-top: 1.5px dashed var(--lilac-mid);
+  margin-top: auto;
+}
+
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: var(--text-mid);
+}
+
+.footer-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  color: var(--text-dark);
+}
+
+.footer-ig {
+  color: var(--lilac-deep);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.footer-ig:hover { text-decoration: underline; }
+
+.footer-sep {
+  color: var(--lilac-mid);
+}
