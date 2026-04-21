@@ -137,13 +137,52 @@
   max-width: 360px;
 }
 
-.preview-social {
-  display: flex;
-  gap: 16px;
-  font-size: 0.78rem;
+.preview-sintacc {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
   color: var(--lilac-deep);
-  font-weight: 600;
-  margin-top: 4px;
+  background: rgba(212, 184, 232, 0.3);
+  padding: 3px 12px;
+  border-radius: 50px;
+  border: 1px solid var(--lilac-mid);
+}
+
+.preview-social-real {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--lilac-mid);
+  width: 100%;
+}
+
+.preview-social-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--lilac-deep);
+}
+
+.preview-social-chip-icon {
+  width: 14px;
+  height: 14px;
+  display: flex;
+}
+
+.preview-social-chip-icon svg { width: 14px; height: 14px; }
+
+.preview-sep { color: var(--lilac-mid); font-size: 0.8rem; }
+
+.preview-footer-note {
+  font-size: 0.75rem;
+  color: var(--text-light);
 }
 
 /* ─── Save bar ────────────────────────── */
@@ -164,6 +203,206 @@
   font-weight: 700;
   color: #2d6b2d;
 }
+
+/* ─── Logo upload ─────────────────────── */
+.logo-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.logo-preview-img {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.9);
+  box-shadow: 0 2px 12px rgba(139,95,173,0.2);
+  flex-shrink: 0;
+}
+
+.logo-upload-btn {
+  cursor: pointer !important;
+}
+
+/* ─── WhatsApp icon in section head ──── */
+.config-section-icon-wa {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #25D366;
+  display: flex;
+  align-items: center;
+}
+
+.btn-whatsapp-test {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(37, 211, 102, 0.1);
+  color: #1a9e4e;
+  border: 1.5px solid rgba(37, 211, 102, 0.4);
+  border-radius: 50px;
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.btn-whatsapp-test:hover {
+  background: rgba(37, 211, 102, 0.2);
+}
+
+/* ─── Social panel ────────────────────── */
+.social-add-trigger {
+  margin-top: 8px;
+  align-self: flex-start;
+}
+
+.social-add-panel {
+  margin-top: 12px;
+  padding: 16px;
+  background: rgba(237, 224, 247, 0.3);
+  border-radius: 14px;
+  border: 1.5px dashed var(--lilac-mid);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.social-panel-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* ─── Social platform grid ───────────── */
+.social-platform-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.social-platform-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 8px;
+  border-radius: 12px;
+  border: 1.5px solid var(--lilac-mid);
+  background: rgba(255,255,255,0.6);
+  color: var(--text-mid);
+  cursor: pointer;
+  transition: all 0.18s;
+  font-family: 'Lato', sans-serif;
+}
+
+.social-platform-btn:hover {
+  border-color: var(--lilac-deep);
+  background: rgba(139, 95, 173, 0.06);
+}
+
+.social-platform-btn.selected {
+  border-color: var(--lilac-deep);
+  background: rgba(139, 95, 173, 0.12);
+  color: var(--lilac-deep);
+}
+
+.social-platform-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.social-platform-icon svg { width: 20px; height: 20px; }
+
+.social-platform-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ─── Social add row ──────────────────── */
+.social-add-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.social-add-preview {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(139, 95, 173, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--lilac-deep);
+}
+
+.social-add-preview svg { width: 18px; height: 18px; }
+
+.social-url-input {
+  flex: 1;
+  margin: 0 !important;
+}
+
+/* ─── Social links list ───────────────── */
+.social-links-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1.5px dashed var(--lilac-mid);
+  padding-top: 14px;
+  margin-top: 4px;
+}
+
+.social-link-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(212, 184, 232, 0.12);
+  border-radius: 10px;
+  border: 1px solid rgba(212, 184, 232, 0.3);
+}
+
+.social-link-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--lilac-deep);
+  flex-shrink: 0;
+  display: flex;
+}
+
+.social-link-icon svg { width: 18px; height: 18px; }
+
+.social-link-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--lilac-deep);
+  min-width: 80px;
+}
+
+.social-link-url {
+  flex: 1;
+  font-size: 0.78rem;
+  color: var(--text-mid);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration: none;
+}
+
+.social-link-url:hover { text-decoration: underline; }
 
 /* ─── Save success toast ──────────────── */
 .save-success {

@@ -70,6 +70,9 @@ const toConfig = r => ({
   instagramUrl: r.instagram_url,
   facebookUrl: r.facebook_url,
   sinTagline: r.sin_tagline,
+  socialLinks: r.social_links ?? [],
+  logoUrl: r.logo_url ?? '/logo.jpeg',
+  footerNote: r.footer_note ?? 'Hecho con amor 🤍',
 })
 
 const fromConfig = c => ({
@@ -82,6 +85,9 @@ const fromConfig = c => ({
   instagram_url: c.instagramUrl,
   facebook_url: c.facebookUrl,
   sin_tagline: c.sinTagline,
+  social_links: c.socialLinks ?? [],
+  logo_url: c.logoUrl ?? '/logo.jpeg',
+  footer_note: c.footerNote ?? 'Hecho con amor 🤍',
 })
 
 // ─── Provider ─────────────────────────────────────────────────────────────────

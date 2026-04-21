@@ -36,7 +36,6 @@ export default function AdminLogin({ onLogin }) {
                 value={user}
                 onChange={e => { setUser(e.target.value); setError(false) }}
                 autoComplete="username"
-                placeholder="admin"
               />
             </div>
             <div className="form-group">
@@ -46,7 +45,6 @@ export default function AdminLogin({ onLogin }) {
                 value={pass}
                 onChange={e => { setPass(e.target.value); setError(false) }}
                 autoComplete="current-password"
-                placeholder="••••••"
               />
             </div>
             {error && (

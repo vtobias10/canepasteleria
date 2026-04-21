@@ -82,5 +82,8 @@ export const initialConfig = {
   instagramHandle: '@canepasteleria',
   instagramUrl: 'https://instagram.com/canepasteleria',
   facebookUrl: '',
-  sinTagline: 'Repostería Sin TACC',
+  sinTagline: 'Sin TACC',
+  logoUrl: '/logo.jpeg',
+  footerNote: 'Hecho con amor 🤍',
+  socialLinks: [],
 }
