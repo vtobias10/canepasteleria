@@ -114,7 +114,7 @@ export default function ShopPage() {
 
         <div className="shop-footer-link">
           <a href={`https://wa.me/${config.whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="btn btn-whatsapp-sm">
-            <WaIcon /> Consultar por WhatsApp
+            <WaIcon /> Pedido personalizado
           </a>
         </div>
       </div>
