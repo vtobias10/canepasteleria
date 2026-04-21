@@ -133,8 +133,8 @@ export default function ShopPage() {
 function ProductCard({ product, index, onClick }) {
   return (
     <button
-      className="product-card card fade-up"
-      style={{ animationDelay: `${index * 0.08}s` }}
+      className="product-card fade-up"
+      style={{ animationDelay: `${index * 0.06}s` }}
       onClick={onClick}
     >
       <div className="product-emoji">{product.emoji || '🍰'}</div>
@@ -142,11 +142,7 @@ function ProductCard({ product, index, onClick }) {
         <span className="product-category badge badge-purple">{product.category}</span>
         <h3 className="product-name">{product.name}</h3>
       </div>
-      <div className="product-cta">
-        <span className="btn btn-primary btn-sm" style={{ width: '100%', justifyContent: 'center' }}>
-          Ver y pedir
-        </span>
-      </div>
+      <div className="product-cta-arrow">→</div>
     </button>
   )
 }
