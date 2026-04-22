@@ -91,10 +91,11 @@
 }
 
 .ingredient-check-custom::after {
-  content: "\\2713";
+  content: "✓";
   display: none;
   color: white;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 700;
   text-align: center;
   line-height: 18px;
   width: 100%;
