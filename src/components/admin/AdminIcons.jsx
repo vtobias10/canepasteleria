@@ -42,6 +42,20 @@ export const SaveIcon = () => (
   </svg>
 )
 
+export const ChevronIcon = () => (
+  <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0 }}>
+    <path d="M1 1l4 4 4-4" />
+  </svg>
+)
+
+export const CartIcon = () => (
+  <svg width="16" height="15" viewBox="0 0 16 15" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0 }}>
+    <path d="M1 1h2.5l1.8 8h7.4l1.3-5H4.3" />
+    <circle cx="6.5" cy="12.5" r="1.1" fill="currentColor" stroke="none" />
+    <circle cx="11.5" cy="12.5" r="1.1" fill="currentColor" stroke="none" />
+  </svg>
+)
+
 export const EyeIcon = () => (
   <svg width="14" height="11" viewBox="0 0 14 11" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0 }}>
     <path d="M1 5.5C2.8 2.2 5 1 7 1s4.2 1.2 6 4.5C11.2 8.8 9 10 7 10S2.8 8.8 1 5.5z" />

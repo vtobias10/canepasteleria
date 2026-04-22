@@ -62,6 +62,10 @@ export default function HomePage() {
           {socialLinks.length > 0 && <span className="home-social-sep">·</span>}
           {config.footerNote && <span>{config.footerNote}</span>}
         </div>
+
+        <div className="hachitec-watermark">
+          ✦ Desarrollado por <strong>Hachitec</strong>
+        </div>
       </div>
 
       <Link to="/canepasteleria-admin" className="admin-access-btn">⚙︎</Link>

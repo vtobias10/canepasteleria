@@ -43,7 +43,7 @@ function PriceBlock({ product }) {
   return <div className="price-main-row"><span className="price-now">{formatMoney(hasSale ? discountedPrice : regularPrice)}</span></div>
 }
 
-export default function ProductModal({ product, whatsappNumber, messageTexts, onClose }) {
+export default function ProductModal({ product, whatsappNumber, messageTexts, onClose, onAddToCart }) {
   const minQty = product.minQuantity || 1
   const [selectedVariants, setSelectedVariants] = useState({})
   const [selectedBolsitas, setSelectedBolsitas] = useState('')
@@ -154,16 +154,41 @@ export default function ProductModal({ product, whatsappNumber, messageTexts, on
           </div>
         </div>
 
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn btn-primary whatsapp-btn"
-          onClick={onClose}
-        >
-          <WaIcon /> Pedir por WhatsApp
-        </a>
-        <p className="modal-note">Se abre WhatsApp con el pedido ya armado</p>
+        <div className="modal-actions">
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-primary whatsapp-btn"
+            onClick={onClose}
+          >
+            <WaIcon /> Pedir por WhatsApp
+          </a>
+          {onAddToCart && (
+            <button
+              type="button"
+              className="btn-add-to-cart"
+              onClick={() => {
+                onAddToCart({
+                  productId: product.id,
+                  productName: product.name,
+                  emoji: product.emoji,
+                  imageUrl: product.imageUrl,
+                  price: product.price,
+                  salePrice: product.salePrice,
+                  quantity,
+                  variantSelections: selectedVariants,
+                  bolsitasXUd: selectedBolsitas,
+                })
+              }}
+            >
+              🛒 Agregar al carrito
+            </button>
+          )}
+        </div>
+        <p className="modal-note">
+          {onAddToCart ? 'Pedí solo este o agregalo al carrito para pedir varios.' : 'Se abre WhatsApp con el pedido ya armado'}
+        </p>
       </div>
     </div>
   )

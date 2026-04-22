@@ -20,6 +20,13 @@ const DEFAULT_ORDER_MESSAGE_TEXTS = {
   closing: 'Me confirmas disponibilidad y precio final? Gracias!',
 }
 
+const DEFAULT_CART_MESSAGE_TEXTS = {
+  greeting: 'Hola! Quiero hacer el siguiente pedido:',
+  productLabel: 'Producto',
+  optionsLabel: 'Opciones',
+  closing: 'Me confirmas disponibilidad y precio final? Gracias!',
+}
+
 export default function ConfigManager() {
   const { config, setConfig } = useData()
   const [form, setForm] = useState({
@@ -30,6 +37,10 @@ export default function ConfigManager() {
     orderMessageTexts: {
       ...DEFAULT_ORDER_MESSAGE_TEXTS,
       ...(config.orderMessageTexts ?? {}),
+    },
+    cartMessageTexts: {
+      ...DEFAULT_CART_MESSAGE_TEXTS,
+      ...(config.cartMessageTexts ?? {}),
     },
   })
   const [saved, setSaved] = useState(false)
@@ -47,6 +58,14 @@ export default function ConfigManager() {
     set('orderMessageTexts', {
       ...DEFAULT_ORDER_MESSAGE_TEXTS,
       ...(form.orderMessageTexts || {}),
+      [key]: value,
+    })
+  }
+
+  function setCartText(key, value) {
+    set('cartMessageTexts', {
+      ...DEFAULT_CART_MESSAGE_TEXTS,
+      ...(form.cartMessageTexts || {}),
       [key]: value,
     })
   }
@@ -242,6 +261,54 @@ export default function ConfigManager() {
               placeholder="Ej: Me confirmas disponibilidad y precio final? Gracias!"
             />
             <span className="field-hint">No edites variables del pedido: se agregan automaticamente.</span>
+          </div>
+        </div>
+
+        <div className="config-section card">
+          <div className="config-section-head">
+            <span className="config-section-icon">🛒</span>
+            <div>
+              <h3>Mensaje de carrito (WhatsApp)</h3>
+              <p>Se usa cuando el cliente pide varios productos desde el carrito</p>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Texto inicial</label>
+            <input
+              value={form.cartMessageTexts?.greeting || ''}
+              onChange={e => setCartText('greeting', e.target.value)}
+              placeholder="Ej: Hola! Quiero hacer el siguiente pedido:"
+            />
+          </div>
+
+          <div className="form-row">
+            <div className="form-group" style={{ flex: 1 }}>
+              <label>Etiqueta producto</label>
+              <input
+                value={form.cartMessageTexts?.productLabel || ''}
+                onChange={e => setCartText('productLabel', e.target.value)}
+                placeholder="Producto"
+              />
+            </div>
+            <div className="form-group" style={{ flex: 1 }}>
+              <label>Etiqueta opciones</label>
+              <input
+                value={form.cartMessageTexts?.optionsLabel || ''}
+                onChange={e => setCartText('optionsLabel', e.target.value)}
+                placeholder="Opciones"
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Texto final</label>
+            <input
+              value={form.cartMessageTexts?.closing || ''}
+              onChange={e => setCartText('closing', e.target.value)}
+              placeholder="Ej: Me confirmas disponibilidad y precio final? Gracias!"
+            />
+            <span className="field-hint">Las líneas de productos se agregan automáticamente entre los textos.</span>
           </div>
         </div>
 

@@ -42,6 +42,32 @@ function formatOptions(selectedVariants) {
   return entries.map(([key, value]) => `- ${key}: ${value}`)
 }
 
+const defaultCartMessageTexts = {
+  greeting: 'Hola! Quiero hacer el siguiente pedido:',
+  productLabel: 'Producto',
+  optionsLabel: 'Opciones',
+  closing: 'Me confirmas disponibilidad y precio final? Gracias!',
+}
+
+export function buildCartWhatsAppUrl(cartItems, whatsappNumber, cartMessageTexts) {
+  const texts = { ...defaultCartMessageTexts, ...(cartMessageTexts || {}) }
+
+  const itemBlocks = cartItems.map(item => {
+    const lines = [`*${texts.productLabel}:* ${item.productName}  ×${item.quantity}`]
+    const opts = Object.entries(item.variantSelections || {})
+      .filter(([, v]) => v)
+      .map(([k, v]) => `- ${k}: ${v}`)
+    if (item.bolsitasXUd) opts.push(`- Bolsitas x ud: ${item.bolsitasXUd}`)
+    if (opts.length > 0) {
+      lines.push(`*${texts.optionsLabel}:*`, ...opts)
+    }
+    return lines.join('\n')
+  })
+
+  const message = [texts.greeting, '', itemBlocks.join('\n\n'), '', texts.closing].join('\n')
+  return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
+}
+
 export function buildWhatsAppUrl(product, selectedVariants, quantity, whatsappNumber, messageTexts) {
   const texts = normalizeMessageTexts(messageTexts)
   const optionLines = formatOptions(selectedVariants)

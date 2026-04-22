@@ -84,6 +84,102 @@
   flex-shrink: 0;
 }
 
+/* ── Custom StatusSelect ── */
+.status-select-wrap {
+  position: relative;
+}
+
+.status-select-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
+  border-radius: 50px;
+  border: 1.5px solid var(--lilac-mid);
+  background: rgba(255, 255, 255, 0.88);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+  font-family: 'Lato', sans-serif;
+}
+
+.status-select-trigger:hover {
+  border-color: var(--lilac-deep);
+  background: rgba(212, 184, 232, 0.15);
+}
+
+.status-trigger--pendiente   { border-color: #c8920a; color: #8a6414; }
+.status-trigger--en-prep     { border-color: var(--lilac-deep); color: var(--lilac-deep); }
+.status-trigger--listo       { border-color: #2e8a2e; color: #1f6b1f; }
+.status-trigger--entregado   { border-color: #1f6b1f; color: #1a5a1a; }
+.status-trigger--cancelado   { border-color: #c05050; color: #b03030; }
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-dot--pendiente  { background: #c8920a; }
+.status-dot--en-prep    { background: var(--lilac-deep); }
+.status-dot--listo      { background: #2e8a2e; }
+.status-dot--entregado  { background: #1f6b1f; }
+.status-dot--cancelado  { background: #c05050; }
+
+.status-select-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 200;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(212, 184, 232, 0.6);
+  border-radius: 14px;
+  padding: 6px;
+  min-width: 172px;
+  box-shadow: 0 8px 32px rgba(139, 95, 173, 0.22);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: dropdownIn 0.15s ease;
+}
+
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.status-select-opt {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 11px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: background 0.14s;
+  text-align: left;
+  width: 100%;
+  font-family: 'Lato', sans-serif;
+}
+
+.status-select-opt:hover { background: rgba(212, 184, 232, 0.25); }
+
+.status-select-opt.active {
+  background: rgba(139, 95, 173, 0.1);
+  color: var(--lilac-deep);
+  font-weight: 700;
+}
+
+/* legacy select (keep for form inside modal) */
 .status-select {
   padding: 6px 28px 6px 12px;
   border-radius: 50px;

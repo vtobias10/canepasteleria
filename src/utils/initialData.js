@@ -101,4 +101,10 @@ export const initialConfig = {
     quantityLabel: 'Cantidad',
     closing: 'Me confirmas disponibilidad y precio final? Gracias!',
   },
+  cartMessageTexts: {
+    greeting: 'Hola! Quiero hacer el siguiente pedido:',
+    productLabel: 'Producto',
+    optionsLabel: 'Opciones',
+    closing: 'Me confirmas disponibilidad y precio final? Gracias!',
+  },
 }

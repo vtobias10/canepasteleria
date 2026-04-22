@@ -1,7 +1,9 @@
 ﻿import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useData } from '../context/DataContext'
+import { useCart } from '../context/CartContext'
 import ProductModal from '../components/public/ProductModal'
+import CartDrawer from '../components/shop/CartDrawer'
 import { getEmojiText, isEmojiImage, normalizeEmojiSrc } from '../utils/emoji'
 import './ShopPage.css'
 
@@ -65,12 +67,14 @@ function ProductPrice({ product }) {
 
 export default function ShopPage() {
   const { products, config } = useData()
+  const { cartCount, addToCart } = useCart()
   const activeProducts = products.filter(product => product.active)
 
   const categories = ['Todos', ...new Set(activeProducts.map(product => product.category).filter(Boolean))]
   const [selectedCategory, setSelectedCategory] = useState('Todos')
   const [page, setPage] = useState(0)
   const [selectedProduct, setSelectedProduct] = useState(null)
+  const [cartOpen, setCartOpen] = useState(false)
 
   const filteredProducts = selectedCategory === 'Todos'
     ? activeProducts
@@ -90,7 +94,13 @@ export default function ShopPage() {
         <Link to="/" className="shop-back-btn">
           {'\u2190'} Inicio
         </Link>
-        <img src={config.logoUrl || '/logo.jpeg'} alt="Cane" className="shop-logo-mini" />
+        <div className="shop-topbar-right">
+          <button className="cart-icon-btn" onClick={() => setCartOpen(true)} aria-label="Ver carrito">
+            🛒
+            {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+          </button>
+          <img src={config.logoUrl || '/logo.jpeg'} alt="Cane" className="shop-logo-mini" />
+        </div>
       </div>
 
       <div className="shop-card fade-up">
@@ -214,7 +224,18 @@ export default function ShopPage() {
             <WaIcon /> Pedido personalizado
           </a>
         </div>
+
+        <div className="hachitec-watermark">
+          ✦ Desarrollado por <strong>Hachitec</strong>
+        </div>
       </div>
+
+      <CartDrawer
+        isOpen={cartOpen}
+        onClose={() => setCartOpen(false)}
+        whatsappNumber={config.whatsappNumber}
+        cartMessageTexts={config.cartMessageTexts}
+      />
 
       {selectedProduct && (
         <ProductModal
@@ -222,6 +243,11 @@ export default function ShopPage() {
           whatsappNumber={config.whatsappNumber}
           messageTexts={config.orderMessageTexts}
           onClose={() => setSelectedProduct(null)}
+          onAddToCart={(item) => {
+            addToCart(item)
+            setSelectedProduct(null)
+            setCartOpen(true)
+          }}
         />
       )}
     </div>

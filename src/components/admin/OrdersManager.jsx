@@ -1,12 +1,19 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useData } from '../../context/DataContext'
 import ChipInput from './ChipInput'
 import { AdminModal, ConfirmModal } from './AdminModal'
 import { getEmojiText } from '../../utils/emoji'
-import { CheckIcon, XIcon, PlusIcon, TrashIcon, SparkleIcon, EyeIcon, EditIcon } from './AdminIcons'
+import { CheckIcon, XIcon, PlusIcon, TrashIcon, SparkleIcon, EyeIcon, EditIcon, ChevronIcon } from './AdminIcons'
 import './OrdersManager.css'
 
 const STATUS_OPTIONS = ['Pendiente', 'En preparación', 'Listo', 'Entregado', 'Cancelado']
+const STATUS_CLASS = {
+  'Pendiente': 'pendiente',
+  'En preparación': 'en-prep',
+  'Listo': 'listo',
+  'Entregado': 'entregado',
+  'Cancelado': 'cancelado',
+}
 const STATUS_BADGES = {
   Pendiente: 'badge-yellow',
   'En preparación': 'badge-purple',
@@ -51,6 +58,51 @@ const emptyOrder = {
   tags: [],
 }
 
+function StatusSelect({ value, onChange }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    if (!open) return
+    function onDown(e) {
+      if (!ref.current?.contains(e.target)) setOpen(false)
+    }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [open])
+
+  const cls = STATUS_CLASS[value] || 'pendiente'
+
+  return (
+    <div className="status-select-wrap" ref={ref}>
+      <button
+        type="button"
+        className={`status-select-trigger status-trigger--${cls}`}
+        onClick={() => setOpen(o => !o)}
+      >
+        <span className={`status-dot status-dot--${cls}`} />
+        {value}
+        <ChevronIcon />
+      </button>
+      {open && (
+        <div className="status-select-dropdown">
+          {STATUS_OPTIONS.map(opt => (
+            <button
+              key={opt}
+              type="button"
+              className={`status-select-opt ${opt === value ? 'active' : ''}`}
+              onClick={() => { onChange(opt); setOpen(false) }}
+            >
+              <span className={`status-dot status-dot--${STATUS_CLASS[opt]}`} />
+              {opt}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function OrdersManager() {
   const { orders, addOrder, updateOrder, deleteOrder } = useData()
   const [modal, setModal] = useState(null)
@@ -65,12 +117,17 @@ export default function OrdersManager() {
 
   const searchClean = search.trim().replace(/^#/, '')
   const filtered = searchClean
-    ? byStatus.filter(order =>
-      order.customerName?.toLowerCase().includes(searchClean.toLowerCase()) ||
-      order.phone?.includes(searchClean) ||
-      order.tags?.some(tag => tag.toLowerCase().includes(searchClean.toLowerCase())) ||
-      (order.orderNumber && String(order.orderNumber).includes(searchClean))
-    )
+    ? byStatus.filter(order => {
+      const numPadded = order.orderNumber ? String(order.orderNumber).padStart(4, '0') : ''
+      const numRaw = order.orderNumber ? String(order.orderNumber) : ''
+      return (
+        order.customerName?.toLowerCase().includes(searchClean.toLowerCase()) ||
+        order.phone?.includes(searchClean) ||
+        order.tags?.some(tag => tag.toLowerCase().includes(searchClean.toLowerCase())) ||
+        numRaw.includes(searchClean) ||
+        numPadded.includes(searchClean)
+      )
+    })
     : byStatus
 
   const sorted = [...filtered].sort((a, b) => new Date(b.date) - new Date(a.date))
@@ -147,7 +204,7 @@ export default function OrdersManager() {
               <div className="order-row-avatar">{order.customerName?.charAt(0)?.toUpperCase() || '?'}</div>
 
               <div className="order-row-number">
-                #{String(order.orderNumber || '?').padStart(3, '0')}
+                #{String(order.orderNumber || '?').padStart(4, '0')}
               </div>
 
               <div className="order-row-main">
@@ -165,15 +222,7 @@ export default function OrdersManager() {
               </div>
 
               <div className="order-row-actions">
-                <select
-                  className="status-select"
-                  value={order.status}
-                  onChange={event => quickStatus(order, event.target.value)}
-                >
-                  {STATUS_OPTIONS.map(status => (
-                    <option key={status} value={status}>{status}</option>
-                  ))}
-                </select>
+                <StatusSelect value={order.status} onChange={status => quickStatus(order, status)} />
                 <button className="btn btn-ghost btn-sm" onClick={() => setViewOrder(order)}><EyeIcon /> Ver</button>
                 <button className="btn btn-ghost btn-sm" onClick={() => setModal({ ...order })}><EditIcon /> Editar</button>
                 <button className="btn btn-danger btn-sm" onClick={() => setConfirmDelete(order)}><TrashIcon /></button>
@@ -224,7 +273,7 @@ function OrderViewModal({ order, onClose, onEdit }) {
   const delivery = formatDelivery(order.deliveryDate)
   const itemCount = order.orderItems?.length || 0
 
-  const orderLabel = order.orderNumber ? ` #${String(order.orderNumber).padStart(3, '0')}` : ''
+  const orderLabel = order.orderNumber ? ` #${String(order.orderNumber).padStart(4, '0')}` : ''
   return (
     <AdminModal
       title={`Detalle del pedido${orderLabel}`}
@@ -364,7 +413,7 @@ function OrderFormModal({ initial, onSave, onClose }) {
 
   return (
     <AdminModal
-      title={form.id ? `Editar pedido${form.orderNumber ? ` #${String(form.orderNumber).padStart(3, '0')}` : ''}` : 'Nuevo pedido'}
+      title={form.id ? `Editar pedido${form.orderNumber ? ` #${String(form.orderNumber).padStart(4, '0')}` : ''}` : 'Nuevo pedido'}
       size="wide"
       onClose={onClose}
       actions={(

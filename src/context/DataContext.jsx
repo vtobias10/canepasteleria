@@ -143,6 +143,7 @@ const toConfig = (row) => ({
   logoUrl: row.logo_url ?? '/logo.jpeg',
   footerNote: row.footer_note ?? 'Hecho con amor',
   orderMessageTexts: row.order_message_texts ?? initialConfig.orderMessageTexts,
+  cartMessageTexts: row.cart_message_texts ?? initialConfig.cartMessageTexts,
 })
 
 const fromConfig = (config) => ({
@@ -159,6 +160,7 @@ const fromConfig = (config) => ({
   logo_url: config.logoUrl ?? '/logo.jpeg',
   footer_note: config.footerNote ?? 'Hecho con amor',
   order_message_texts: config.orderMessageTexts ?? initialConfig.orderMessageTexts,
+  cart_message_texts: config.cartMessageTexts ?? initialConfig.cartMessageTexts,
 })
 
 const stripOptionalConfigFields = (payload) => {
@@ -168,11 +170,19 @@ const stripOptionalConfigFields = (payload) => {
 
 function stripMissingConfigFields(payload, errorMessage = '') {
   const message = String(errorMessage || '').toLowerCase()
+  let result = { ...payload }
   if (message.includes('order_message_texts')) {
-    const { order_message_texts, ...rest } = payload
-    return rest
+    const { order_message_texts, ...rest } = result
+    result = rest
   }
-  return stripOptionalConfigFields(payload)
+  if (message.includes('cart_message_texts')) {
+    const { cart_message_texts, ...rest } = result
+    result = rest
+  }
+  if (Object.keys(result).length === Object.keys(payload).length) {
+    return stripOptionalConfigFields(payload)
+  }
+  return result
 }
 
 const toCategory = (row) => ({
