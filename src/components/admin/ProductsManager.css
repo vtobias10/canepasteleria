@@ -33,8 +33,18 @@
   transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
-.sortable-row.drag-over td {
-  background: rgba(212, 184, 232, 0.22) !important;
+.sortable-row td {
+  transition: background-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.sortable-row.drag-over-before td {
+  background: rgba(212, 184, 232, 0.18) !important;
+  box-shadow: inset 0 3px 0 rgba(139, 95, 173, 0.9);
+}
+
+.sortable-row.drag-over-after td {
+  background: rgba(212, 184, 232, 0.18) !important;
+  box-shadow: inset 0 -3px 0 rgba(139, 95, 173, 0.9);
 }
 
 .sortable-row.dragging {

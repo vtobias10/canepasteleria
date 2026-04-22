@@ -36,8 +36,14 @@
 
 .ingredient-row:hover { background: rgba(212, 184, 232, 0.08); }
 
-.ingredient-row.drag-over {
-  background: rgba(212, 184, 232, 0.22) !important;
+.ingredient-row.drag-over-before {
+  background: rgba(212, 184, 232, 0.18) !important;
+  box-shadow: inset 0 3px 0 rgba(139, 95, 173, 0.9);
+}
+
+.ingredient-row.drag-over-after {
+  background: rgba(212, 184, 232, 0.18) !important;
+  box-shadow: inset 0 -3px 0 rgba(139, 95, 173, 0.9);
 }
 
 .ingredient-row.dragging {

@@ -3,6 +3,19 @@ import { useData } from '../../context/DataContext'
 import { ConfirmModal } from './AdminModal'
 import './IngredientsManager.css'
 
+function moveIdRelative(ids, draggingId, targetId, position) {
+  if (!draggingId || !targetId || draggingId === targetId) return ids
+  const next = [...ids]
+  const from = next.indexOf(draggingId)
+  if (from === -1) return ids
+  next.splice(from, 1)
+  const targetIndex = next.indexOf(targetId)
+  if (targetIndex === -1) return ids
+  const insertAt = position === 'after' ? targetIndex + 1 : targetIndex
+  next.splice(insertAt, 0, draggingId)
+  return next
+}
+
 export default function IngredientsManager() {
   const { ingredients, addIngredient, updateIngredient, deleteIngredient, toggleIngredientStock, reorderIngredients } = useData()
   const [newName, setNewName] = useState('')
@@ -13,12 +26,21 @@ export default function IngredientsManager() {
   const [confirmDelete, setConfirmDelete] = useState(null)
   const [dragIngredientId, setDragIngredientId] = useState(null)
   const [dragOverIngredientId, setDragOverIngredientId] = useState(null)
+  const [dragOverPosition, setDragOverPosition] = useState(null)
+  const [previewIngredientIds, setPreviewIngredientIds] = useState(null)
 
+  const canDragReorder = filter === 'all' && search.trim() === ''
   const outOfStock = ingredients.filter(item => !item.inStock)
   const inStock = ingredients.filter(item => item.inStock)
-  const byFilter = filter === 'all' ? ingredients : filter === 'inStock' ? inStock : outOfStock
+  const orderedIngredients = canDragReorder && previewIngredientIds
+    ? previewIngredientIds.map(id => ingredients.find(item => item.id === id)).filter(Boolean)
+    : ingredients
+  const byFilter = filter === 'all'
+    ? orderedIngredients
+    : filter === 'inStock'
+      ? orderedIngredients.filter(item => item.inStock)
+      : orderedIngredients.filter(item => !item.inStock)
   const filtered = byFilter.filter(item => item.name.toLowerCase().includes(search.toLowerCase()))
-  const canDragReorder = filter === 'all' && search.trim() === ''
 
   function handleAdd(event) {
     event.preventDefault()
@@ -42,43 +64,54 @@ export default function IngredientsManager() {
     event.dataTransfer.effectAllowed = 'move'
     event.dataTransfer.setData('text/plain', id)
     setDragIngredientId(id)
+    setDragOverPosition(null)
+    setPreviewIngredientIds(ingredients.map(item => item.id))
   }
 
   function handleDragOver(event, id) {
     if (!dragIngredientId || !canDragReorder) return
     event.preventDefault()
+    const rowRect = event.currentTarget.getBoundingClientRect()
+    const position = event.clientY >= rowRect.top + rowRect.height / 2 ? 'after' : 'before'
     if (dragOverIngredientId !== id) {
       setDragOverIngredientId(id)
     }
+    if (dragOverPosition !== position) {
+      setDragOverPosition(position)
+    }
+    setPreviewIngredientIds((prev) => {
+      const base = prev || ingredients.map(item => item.id)
+      return moveIdRelative(base, dragIngredientId, id, position)
+    })
   }
 
   function handleDrop(targetId) {
-    if (!dragIngredientId || !targetId || dragIngredientId === targetId || !canDragReorder) {
+    if (!dragIngredientId || !targetId || !canDragReorder) {
       setDragIngredientId(null)
       setDragOverIngredientId(null)
+      setDragOverPosition(null)
+      setPreviewIngredientIds(null)
       return
     }
 
-    const from = ingredients.findIndex(item => item.id === dragIngredientId)
-    const to = ingredients.findIndex(item => item.id === targetId)
-    if (from === -1 || to === -1) {
-      setDragIngredientId(null)
-      setDragOverIngredientId(null)
-      return
+    const currentIds = ingredients.map(item => item.id)
+    const nextIds = previewIngredientIds || currentIds
+    const changed = nextIds.some((id, index) => id !== currentIds[index])
+    if (changed) {
+      reorderIngredients(nextIds)
     }
-
-    const next = [...ingredients]
-    const [moved] = next.splice(from, 1)
-    next.splice(to, 0, moved)
-    reorderIngredients(next.map(item => item.id))
 
     setDragIngredientId(null)
     setDragOverIngredientId(null)
+    setDragOverPosition(null)
+    setPreviewIngredientIds(null)
   }
 
   function handleDragEnd() {
     setDragIngredientId(null)
     setDragOverIngredientId(null)
+    setDragOverPosition(null)
+    setPreviewIngredientIds(null)
   }
 
   return (
@@ -148,7 +181,7 @@ export default function IngredientsManager() {
         {filtered.map(ingredient => (
           <div
             key={ingredient.id}
-            className={`ingredient-row ${!ingredient.inStock ? 'out-of-stock' : ''} ${dragIngredientId === ingredient.id ? 'dragging' : ''} ${dragOverIngredientId === ingredient.id ? 'drag-over' : ''}`}
+            className={`ingredient-row ${!ingredient.inStock ? 'out-of-stock' : ''} ${dragIngredientId === ingredient.id ? 'dragging' : ''} ${dragOverIngredientId === ingredient.id && dragIngredientId !== ingredient.id && dragOverPosition === 'before' ? 'drag-over-before' : ''} ${dragOverIngredientId === ingredient.id && dragIngredientId !== ingredient.id && dragOverPosition === 'after' ? 'drag-over-after' : ''}`}
             onDragOver={event => handleDragOver(event, ingredient.id)}
             onDrop={() => handleDrop(ingredient.id)}
           >

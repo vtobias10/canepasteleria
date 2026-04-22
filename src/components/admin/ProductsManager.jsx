@@ -56,6 +56,19 @@ function renderPrice(product) {
   return <strong className="admin-product-price-sale">{formatMoney(hasSale ? discountedPrice : regularPrice)}</strong>
 }
 
+function moveIdRelative(ids, draggingId, targetId, position) {
+  if (!draggingId || !targetId || draggingId === targetId) return ids
+  const next = [...ids]
+  const from = next.indexOf(draggingId)
+  if (from === -1) return ids
+  next.splice(from, 1)
+  const targetIndex = next.indexOf(targetId)
+  if (targetIndex === -1) return ids
+  const insertAt = position === 'after' ? targetIndex + 1 : targetIndex
+  next.splice(insertAt, 0, draggingId)
+  return next
+}
+
 export default function ProductsManager() {
   const { products, categories, addProduct, updateProduct, deleteProduct, reorderProducts } = useData()
   const [modal, setModal] = useState(null)
@@ -63,12 +76,18 @@ export default function ProductsManager() {
   const [search, setSearch] = useState('')
   const [dragProductId, setDragProductId] = useState(null)
   const [dragOverProductId, setDragOverProductId] = useState(null)
+  const [dragOverPosition, setDragOverPosition] = useState(null)
+  const [previewProductIds, setPreviewProductIds] = useState(null)
 
-  const displayed = products.filter(product =>
+  const canDragReorder = search.trim() === ''
+  const orderedProducts = canDragReorder && previewProductIds
+    ? previewProductIds.map(id => products.find(item => item.id === id)).filter(Boolean)
+    : products
+
+  const displayed = orderedProducts.filter(product =>
     product.name?.toLowerCase().includes(search.toLowerCase()) ||
     product.category?.toLowerCase().includes(search.toLowerCase())
   )
-  const canDragReorder = search.trim() === ''
 
   function handleSave(data) {
     if (data.id) {
@@ -89,43 +108,55 @@ export default function ProductsManager() {
     event.dataTransfer.effectAllowed = 'move'
     event.dataTransfer.setData('text/plain', id)
     setDragProductId(id)
+    setDragOverPosition(null)
+    setPreviewProductIds(products.map(item => item.id))
   }
 
   function handleDragOver(event, id) {
     if (!dragProductId || !canDragReorder) return
     event.preventDefault()
+    const rowRect = event.currentTarget.getBoundingClientRect()
+    const position = event.clientY >= rowRect.top + rowRect.height / 2 ? 'after' : 'before'
     if (dragOverProductId !== id) {
       setDragOverProductId(id)
     }
+    if (dragOverPosition !== position) {
+      setDragOverPosition(position)
+    }
+    setPreviewProductIds((prev) => {
+      const base = prev || products.map(item => item.id)
+      const next = moveIdRelative(base, dragProductId, id, position)
+      return next
+    })
   }
 
   function handleDrop(targetId) {
-    if (!dragProductId || !targetId || dragProductId === targetId || !canDragReorder) {
+    if (!dragProductId || !targetId || !canDragReorder) {
       setDragProductId(null)
       setDragOverProductId(null)
+      setDragOverPosition(null)
+      setPreviewProductIds(null)
       return
     }
 
-    const from = products.findIndex(item => item.id === dragProductId)
-    const to = products.findIndex(item => item.id === targetId)
-    if (from === -1 || to === -1) {
-      setDragProductId(null)
-      setDragOverProductId(null)
-      return
+    const currentIds = products.map(item => item.id)
+    const nextIds = previewProductIds || currentIds
+    const changed = nextIds.some((id, index) => id !== currentIds[index])
+    if (changed) {
+      reorderProducts(nextIds)
     }
-
-    const next = [...products]
-    const [moved] = next.splice(from, 1)
-    next.splice(to, 0, moved)
-    reorderProducts(next.map(item => item.id))
 
     setDragProductId(null)
     setDragOverProductId(null)
+    setDragOverPosition(null)
+    setPreviewProductIds(null)
   }
 
   function handleDragEnd() {
     setDragProductId(null)
     setDragOverProductId(null)
+    setDragOverPosition(null)
+    setPreviewProductIds(null)
   }
 
   return (
@@ -177,7 +208,7 @@ export default function ProductsManager() {
             {displayed.map(product => (
               <tr
                 key={product.id}
-                className={`sortable-row ${dragProductId === product.id ? 'dragging' : ''} ${dragOverProductId === product.id ? 'drag-over' : ''}`}
+                className={`sortable-row ${dragProductId === product.id ? 'dragging' : ''} ${dragOverProductId === product.id && dragProductId !== product.id && dragOverPosition === 'before' ? 'drag-over-before' : ''} ${dragOverProductId === product.id && dragProductId !== product.id && dragOverPosition === 'after' ? 'drag-over-after' : ''}`}
                 onDragOver={event => handleDragOver(event, product.id)}
                 onDrop={() => handleDrop(product.id)}
               >
