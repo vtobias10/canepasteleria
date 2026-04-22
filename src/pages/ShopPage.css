@@ -1,6 +1,7 @@
 .shop-outer {
   height: 100vh;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -13,7 +14,7 @@
 
 .shop-topbar {
   width: 100%;
-  max-width: 920px;
+  max-width: min(1120px, 96vw);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -51,7 +52,7 @@
 
 .shop-card {
   width: 100%;
-  max-width: 920px;
+  max-width: min(1120px, 96vw);
   background: rgba(255, 255, 255, 0.76);
   backdrop-filter: blur(16px);
   border-radius: 24px;
@@ -61,7 +62,9 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  overflow: hidden;
+  max-height: calc(100vh - 92px);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .shop-card-header {
@@ -326,6 +329,29 @@
 
   .product-card-inner {
     padding: 11px 8px;
+  }
+}
+
+@media (max-width: 1050px) {
+  .shop-card {
+    padding: 16px 18px 14px;
+    border-radius: 20px;
+  }
+
+  .products-grid {
+    gap: 10px;
+  }
+}
+
+@media (max-height: 820px) {
+  .shop-outer {
+    justify-content: flex-start;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .shop-card {
+    max-height: calc(100vh - 80px);
   }
 }
 

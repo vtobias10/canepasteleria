@@ -57,7 +57,7 @@ function renderPrice(product) {
 }
 
 export default function ProductsManager() {
-  const { products, categories, addProduct, updateProduct, deleteProduct } = useData()
+  const { products, categories, addProduct, updateProduct, deleteProduct, moveProduct } = useData()
   const [modal, setModal] = useState(null)
   const [confirmDelete, setConfirmDelete] = useState(null)
   const [search, setSearch] = useState('')
@@ -165,6 +165,22 @@ export default function ProductsManager() {
                 </td>
                 <td>
                   <div className="table-actions">
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => moveProduct(product.id, 'up')}
+                      disabled={products.findIndex(item => item.id === product.id) === 0}
+                      title="Mover arriba"
+                    >
+                      ↑
+                    </button>
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => moveProduct(product.id, 'down')}
+                      disabled={products.findIndex(item => item.id === product.id) === products.length - 1}
+                      title="Mover abajo"
+                    >
+                      ↓
+                    </button>
                     <button className="btn btn-ghost btn-sm" onClick={() => setModal({ ...product })}>Editar</button>
                     <button className="btn btn-danger btn-sm" onClick={() => setConfirmDelete(product)}>Eliminar</button>
                   </div>

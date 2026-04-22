@@ -4,7 +4,7 @@ import { ConfirmModal } from './AdminModal'
 import './IngredientsManager.css'
 
 export default function IngredientsManager() {
-  const { ingredients, addIngredient, updateIngredient, deleteIngredient, toggleIngredientStock } = useData()
+  const { ingredients, addIngredient, updateIngredient, deleteIngredient, toggleIngredientStock, moveIngredient } = useData()
   const [newName, setNewName] = useState('')
   const [editId, setEditId] = useState(null)
   const [editName, setEditName] = useState('')
@@ -124,6 +124,22 @@ export default function IngredientsManager() {
             </div>
 
             <div className="ingredient-actions">
+              <button
+                className="btn btn-ghost btn-sm"
+                onClick={() => moveIngredient(ingredient.id, 'up')}
+                disabled={ingredients.findIndex(item => item.id === ingredient.id) === 0}
+                title="Mover arriba"
+              >
+                ↑
+              </button>
+              <button
+                className="btn btn-ghost btn-sm"
+                onClick={() => moveIngredient(ingredient.id, 'down')}
+                disabled={ingredients.findIndex(item => item.id === ingredient.id) === ingredients.length - 1}
+                title="Mover abajo"
+              >
+                ↓
+              </button>
               <button
                 className="btn btn-ghost btn-sm"
                 onClick={() => (editId === ingredient.id ? saveEdit(ingredient.id) : startEdit(ingredient))}

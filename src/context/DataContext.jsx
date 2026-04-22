@@ -10,6 +10,13 @@ const toNumberOrNull = (value) => {
   return Number.isFinite(num) ? num : null
 }
 
+const toPositiveIntOrNull = (value) => {
+  const num = Number(value)
+  if (!Number.isFinite(num)) return null
+  const integer = Math.floor(num)
+  return integer > 0 ? integer : null
+}
+
 const normalizeSalePrice = (value) => {
   const amount = toNumberOrNull(value)
   if (amount === null || amount <= 0) return null
@@ -25,6 +32,7 @@ const toProduct = (row) => ({
   name: row.name,
   description: row.description,
   category: row.category,
+  sortOrder: toPositiveIntOrNull(row.sort_order),
   variants: row.variants ?? [],
   bolsitasXUd: row.bolsitas_x_ud ?? [],
   price: toNumberOrNull(row.price),
@@ -40,6 +48,7 @@ const fromProduct = (product) => ({
   name: product.name,
   description: product.description,
   category: product.category,
+  sort_order: toPositiveIntOrNull(product.sortOrder),
   variants: product.variants ?? [],
   bolsitas_x_ud: product.bolsitasXUd ?? [],
   price: toNumberOrNull(product.price),
@@ -51,7 +60,7 @@ const fromProduct = (product) => ({
 })
 
 const stripOptionalProductFields = (payload) => {
-  const { price, sale_price, ...rest } = payload
+  const { price, sale_price, sort_order, ...rest } = payload
   return rest
 }
 
@@ -62,6 +71,12 @@ function stripMissingProductFields(payload, errorMessage = '') {
 
   const missingPrice = message.includes('price') && !message.includes('sale_price')
   const missingSalePrice = message.includes('sale_price')
+  const missingSortOrder = message.includes('sort_order')
+
+  if (missingPrice && missingSalePrice && missingSortOrder) {
+    const { price, sale_price, sort_order, ...rest } = payload
+    return rest
+  }
 
   if (missingPrice && missingSalePrice) {
     const { price, sale_price, ...rest } = payload
@@ -78,11 +93,34 @@ function stripMissingProductFields(payload, errorMessage = '') {
     return rest
   }
 
+  if (missingSortOrder) {
+    const { sort_order, ...rest } = payload
+    return rest
+  }
+
   return stripOptionalProductFields(payload)
 }
 
-const toIngredient = (row) => ({ id: row.id, name: row.name, inStock: row.in_stock ?? true })
-const fromIngredient = (ingredient) => ({ id: ingredient.id, name: ingredient.name, in_stock: ingredient.inStock ?? true })
+const toIngredient = (row) => ({
+  id: row.id,
+  name: row.name,
+  inStock: row.in_stock ?? true,
+  sortOrder: toPositiveIntOrNull(row.sort_order),
+})
+
+const fromIngredient = (ingredient) => ({
+  id: ingredient.id,
+  name: ingredient.name,
+  in_stock: ingredient.inStock ?? true,
+  sort_order: toPositiveIntOrNull(ingredient.sortOrder),
+})
+
+function stripMissingIngredientFields(payload, errorMessage = '') {
+  const message = String(errorMessage || '').toLowerCase()
+  if (!message.includes('sort_order')) return payload
+  const { sort_order, ...rest } = payload
+  return rest
+}
 
 const toOrder = (row) => ({
   id: row.id,
@@ -182,6 +220,38 @@ function deriveCategoriesFromProducts(productsList) {
   )
 }
 
+function normalizeSortOrder(list) {
+  return list.map((item, index) => ({
+    ...item,
+    sortOrder: index + 1,
+  }))
+}
+
+function moveByDirection(list, id, direction) {
+  const currentIndex = list.findIndex(item => item.id === id)
+  if (currentIndex === -1) return null
+
+  const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
+  if (targetIndex < 0 || targetIndex >= list.length) return null
+
+  const next = [...list]
+  const [moved] = next.splice(currentIndex, 1)
+  next.splice(targetIndex, 0, moved)
+  return normalizeSortOrder(next)
+}
+
+async function persistSortOrder(table, list) {
+  const updates = await Promise.all(
+    list.map(item => (
+      supabase.from(table).update({ sort_order: item.sortOrder }).eq('id', item.id)
+    )),
+  )
+
+  updates.forEach(({ error }) => {
+    if (error) console.error(`persistSortOrder(${table}):`, error)
+  })
+}
+
 export function DataProvider({ children }) {
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
@@ -211,13 +281,22 @@ export function DataProvider({ children }) {
         if (productsErr) throw productsErr
         if (ingredientsErr) throw ingredientsErr
 
-        const mappedProducts = (productsRows || []).map(toProduct)
+        const mappedProducts = normalizeSortOrder(
+          (productsRows || [])
+            .map(toProduct)
+            .sort((a, b) => (a.sortOrder ?? Number.MAX_SAFE_INTEGER) - (b.sortOrder ?? Number.MAX_SAFE_INTEGER)),
+        )
+        const mappedIngredients = normalizeSortOrder(
+          (ingredientsRows || [])
+            .map(toIngredient)
+            .sort((a, b) => (a.sortOrder ?? Number.MAX_SAFE_INTEGER) - (b.sortOrder ?? Number.MAX_SAFE_INTEGER)),
+        )
         const persistedCategories = categoriesErr ? [] : (categoriesRows || []).map(toCategory)
         const derivedCategories = deriveCategoriesFromProducts(mappedProducts)
 
         setProducts(mappedProducts)
         setCategories(mergeCategoryLists(persistedCategories, derivedCategories))
-        setIngredients((ingredientsRows || []).map(toIngredient))
+        setIngredients(mappedIngredients)
         setOrders((ordersRows || []).map(toOrder))
         setConfigState(configRow ? toConfig(configRow) : initialConfig)
 
@@ -235,7 +314,8 @@ export function DataProvider({ children }) {
   }, [])
 
   async function addProduct(product) {
-    const newProduct = { ...product, id: crypto.randomUUID() }
+    const maxOrder = products.reduce((max, item) => Math.max(max, item.sortOrder || 0), 0)
+    const newProduct = { ...product, id: crypto.randomUUID(), sortOrder: maxOrder + 1 }
     setProducts(prev => [...prev, newProduct])
 
     const payload = fromProduct(newProduct)
@@ -268,9 +348,26 @@ export function DataProvider({ children }) {
   }
 
   async function deleteProduct(id) {
-    setProducts(prev => prev.filter(product => product.id !== id))
+    let reordered = []
+    setProducts(prev => {
+      reordered = normalizeSortOrder(prev.filter(product => product.id !== id))
+      return reordered
+    })
     const { error: deleteError } = await supabase.from('products').delete().eq('id', id)
     if (deleteError) console.error('deleteProduct:', deleteError)
+    if (reordered.length > 0) {
+      await persistSortOrder('products', reordered)
+    }
+  }
+
+  async function moveProduct(id, direction) {
+    let reordered = null
+    setProducts(prev => {
+      reordered = moveByDirection(prev, id, direction)
+      return reordered || prev
+    })
+    if (!reordered) return
+    await persistSortOrder('products', reordered)
   }
 
   async function addCategory(category) {
@@ -364,9 +461,15 @@ export function DataProvider({ children }) {
   }
 
   async function addIngredient(ingredient) {
-    const newIngredient = { ...ingredient, id: crypto.randomUUID() }
+    const maxOrder = ingredients.reduce((max, item) => Math.max(max, item.sortOrder || 0), 0)
+    const newIngredient = { ...ingredient, id: crypto.randomUUID(), sortOrder: maxOrder + 1 }
     setIngredients(prev => [...prev, newIngredient])
-    const { error: addError } = await supabase.from('ingredients').insert(fromIngredient(newIngredient))
+    const payload = fromIngredient(newIngredient)
+    let { error: addError } = await supabase.from('ingredients').insert(payload)
+    if (addError) {
+      const fallback = await supabase.from('ingredients').insert(stripMissingIngredientFields(payload, addError.message))
+      addError = fallback.error
+    }
     if (addError) console.error('addIngredient:', addError)
   }
 
@@ -374,17 +477,42 @@ export function DataProvider({ children }) {
     setIngredients(prev => prev.map(ingredient => (ingredient.id === id ? { ...ingredient, ...data } : ingredient)))
     const existing = ingredients.find(ingredient => ingredient.id === id)
     if (!existing) return
-    const { error: updateError } = await supabase
+    const payload = fromIngredient({ ...existing, ...data })
+    let { error: updateError } = await supabase
       .from('ingredients')
-      .update(fromIngredient({ ...existing, ...data }))
+      .update(payload)
       .eq('id', id)
+    if (updateError) {
+      const fallback = await supabase
+        .from('ingredients')
+        .update(stripMissingIngredientFields(payload, updateError.message))
+        .eq('id', id)
+      updateError = fallback.error
+    }
     if (updateError) console.error('updateIngredient:', updateError)
   }
 
   async function deleteIngredient(id) {
-    setIngredients(prev => prev.filter(ingredient => ingredient.id !== id))
+    let reordered = []
+    setIngredients(prev => {
+      reordered = normalizeSortOrder(prev.filter(ingredient => ingredient.id !== id))
+      return reordered
+    })
     const { error: deleteError } = await supabase.from('ingredients').delete().eq('id', id)
     if (deleteError) console.error('deleteIngredient:', deleteError)
+    if (reordered.length > 0) {
+      await persistSortOrder('ingredients', reordered)
+    }
+  }
+
+  async function moveIngredient(id, direction) {
+    let reordered = null
+    setIngredients(prev => {
+      reordered = moveByDirection(prev, id, direction)
+      return reordered || prev
+    })
+    if (!reordered) return
+    await persistSortOrder('ingredients', reordered)
   }
 
   async function toggleIngredientStock(id) {
@@ -489,6 +617,7 @@ export function DataProvider({ children }) {
         addProduct,
         updateProduct,
         deleteProduct,
+        moveProduct,
         categories,
         addCategory,
         updateCategory,
@@ -498,6 +627,7 @@ export function DataProvider({ children }) {
         updateIngredient,
         deleteIngredient,
         toggleIngredientStock,
+        moveIngredient,
         orders,
         addOrder,
         updateOrder,
