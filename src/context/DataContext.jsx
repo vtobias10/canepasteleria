@@ -600,6 +600,7 @@ export function DataProvider({ children }) {
   if (loading) {
     return (
       <div
+        className="app-loading-screen"
         style={{
           height: '100vh',
           display: 'flex',

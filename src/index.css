@@ -15,6 +15,8 @@
   --cursor-default: url('/cursors/normal-select.cur'), auto;
   --cursor-pointer: url('/cursors/link-select.cur'), pointer;
   --cursor-text: url('/cursors/text-select.cur'), text;
+  --cursor-unavailable: url('/cursors/unavailable.cur'), not-allowed;
+  --cursor-working: url('/cursors/working.cur'), wait;
 }
 
 * {
@@ -406,8 +408,13 @@ button:disabled,
 input:disabled,
 [disabled],
 [aria-disabled='true'] {
-  cursor: not-allowed !important;
+  cursor: var(--cursor-unavailable) !important;
   pointer-events: auto !important;
+}
+
+.app-loading-screen,
+.app-loading-screen * {
+  cursor: var(--cursor-working) !important;
 }
 
 .hachitec-watermark {
