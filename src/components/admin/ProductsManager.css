@@ -19,6 +19,58 @@
   color: var(--text-dark);
 }
 
+.sort-col-head {
+  width: 58px;
+  text-align: center !important;
+}
+
+.sort-col-cell {
+  width: 58px;
+  text-align: center !important;
+}
+
+.sortable-row {
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.sortable-row.drag-over td {
+  background: rgba(212, 184, 232, 0.22) !important;
+}
+
+.sortable-row.dragging {
+  opacity: 0.65;
+}
+
+.drag-handle {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1.5px dashed rgba(139, 95, 173, 0.45);
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--lilac-deep);
+  font-size: 1.05rem;
+  letter-spacing: -0.12em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  transition: all 0.16s ease;
+}
+
+.drag-handle:hover {
+  border-color: var(--lilac-deep);
+  background: rgba(212, 184, 232, 0.22);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.drag-handle.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .admin-product-emoji {
   font-size: 1.5rem;
   line-height: 1;

@@ -4,18 +4,21 @@ import { ConfirmModal } from './AdminModal'
 import './IngredientsManager.css'
 
 export default function IngredientsManager() {
-  const { ingredients, addIngredient, updateIngredient, deleteIngredient, toggleIngredientStock, moveIngredient } = useData()
+  const { ingredients, addIngredient, updateIngredient, deleteIngredient, toggleIngredientStock, reorderIngredients } = useData()
   const [newName, setNewName] = useState('')
   const [editId, setEditId] = useState(null)
   const [editName, setEditName] = useState('')
   const [filter, setFilter] = useState('all')
   const [search, setSearch] = useState('')
   const [confirmDelete, setConfirmDelete] = useState(null)
+  const [dragIngredientId, setDragIngredientId] = useState(null)
+  const [dragOverIngredientId, setDragOverIngredientId] = useState(null)
 
   const outOfStock = ingredients.filter(item => !item.inStock)
   const inStock = ingredients.filter(item => item.inStock)
   const byFilter = filter === 'all' ? ingredients : filter === 'inStock' ? inStock : outOfStock
   const filtered = byFilter.filter(item => item.name.toLowerCase().includes(search.toLowerCase()))
+  const canDragReorder = filter === 'all' && search.trim() === ''
 
   function handleAdd(event) {
     event.preventDefault()
@@ -34,6 +37,50 @@ export default function IngredientsManager() {
     setEditId(null)
   }
 
+  function handleDragStart(event, id) {
+    if (!canDragReorder) return
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('text/plain', id)
+    setDragIngredientId(id)
+  }
+
+  function handleDragOver(event, id) {
+    if (!dragIngredientId || !canDragReorder) return
+    event.preventDefault()
+    if (dragOverIngredientId !== id) {
+      setDragOverIngredientId(id)
+    }
+  }
+
+  function handleDrop(targetId) {
+    if (!dragIngredientId || !targetId || dragIngredientId === targetId || !canDragReorder) {
+      setDragIngredientId(null)
+      setDragOverIngredientId(null)
+      return
+    }
+
+    const from = ingredients.findIndex(item => item.id === dragIngredientId)
+    const to = ingredients.findIndex(item => item.id === targetId)
+    if (from === -1 || to === -1) {
+      setDragIngredientId(null)
+      setDragOverIngredientId(null)
+      return
+    }
+
+    const next = [...ingredients]
+    const [moved] = next.splice(from, 1)
+    next.splice(to, 0, moved)
+    reorderIngredients(next.map(item => item.id))
+
+    setDragIngredientId(null)
+    setDragOverIngredientId(null)
+  }
+
+  function handleDragEnd() {
+    setDragIngredientId(null)
+    setDragOverIngredientId(null)
+  }
+
   return (
     <div>
       <div className="admin-section-header">
@@ -44,6 +91,11 @@ export default function IngredientsManager() {
               {outOfStock.length} faltantes
             </span>
           </p>
+          {!canDragReorder && (
+            <p style={{ color: 'var(--text-light)', fontSize: '0.76rem', marginTop: 4 }}>
+              Para reordenar, usa filtro "Todos" y limpia la busqueda.
+            </p>
+          )}
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
           <input
@@ -89,12 +141,29 @@ export default function IngredientsManager() {
       <div className="ingredients-list card fade-up">
         {filtered.length === 0 && (
           <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-light)' }}>
-            No hay ingredientes en esta categoría
+            No hay ingredientes en esta categoria
           </div>
         )}
 
         {filtered.map(ingredient => (
-          <div key={ingredient.id} className={`ingredient-row ${!ingredient.inStock ? 'out-of-stock' : ''}`}>
+          <div
+            key={ingredient.id}
+            className={`ingredient-row ${!ingredient.inStock ? 'out-of-stock' : ''} ${dragIngredientId === ingredient.id ? 'dragging' : ''} ${dragOverIngredientId === ingredient.id ? 'drag-over' : ''}`}
+            onDragOver={event => handleDragOver(event, ingredient.id)}
+            onDrop={() => handleDrop(ingredient.id)}
+          >
+            <button
+              type="button"
+              className={`ingredient-drag-handle ${canDragReorder ? '' : 'disabled'}`}
+              draggable={canDragReorder}
+              onDragStart={event => handleDragStart(event, ingredient.id)}
+              onDragEnd={handleDragEnd}
+              title={canDragReorder ? 'Arrastrar para reordenar' : 'Limpia la busqueda para reordenar'}
+              aria-label="Arrastrar para reordenar"
+            >
+              ⋮⋮
+            </button>
+
             <label className="ingredient-check">
               <input
                 type="checkbox"
@@ -126,22 +195,6 @@ export default function IngredientsManager() {
             <div className="ingredient-actions">
               <button
                 className="btn btn-ghost btn-sm"
-                onClick={() => moveIngredient(ingredient.id, 'up')}
-                disabled={ingredients.findIndex(item => item.id === ingredient.id) === 0}
-                title="Mover arriba"
-              >
-                ↑
-              </button>
-              <button
-                className="btn btn-ghost btn-sm"
-                onClick={() => moveIngredient(ingredient.id, 'down')}
-                disabled={ingredients.findIndex(item => item.id === ingredient.id) === ingredients.length - 1}
-                title="Mover abajo"
-              >
-                ↓
-              </button>
-              <button
-                className="btn btn-ghost btn-sm"
                 onClick={() => (editId === ingredient.id ? saveEdit(ingredient.id) : startEdit(ingredient))}
               >
                 {editId === ingredient.id ? 'Guardar' : 'Editar'}
@@ -159,7 +212,7 @@ export default function IngredientsManager() {
           title="¿Eliminar ingrediente?"
           message={(
             <>
-              Se eliminará <strong>{confirmDelete.name}</strong> del inventario. Esta acción no se puede deshacer.
+              Se eliminara <strong>{confirmDelete.name}</strong> del inventario. Esta accion no se puede deshacer.
             </>
           )}
           onCancel={() => setConfirmDelete(null)}

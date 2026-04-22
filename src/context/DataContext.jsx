@@ -240,6 +240,22 @@ function moveByDirection(list, id, direction) {
   return normalizeSortOrder(next)
 }
 
+function reorderByIds(list, orderedIds) {
+  const byId = new Map(list.map(item => [item.id, item]))
+  const next = []
+
+  orderedIds.forEach((id) => {
+    const item = byId.get(id)
+    if (item) {
+      next.push(item)
+      byId.delete(id)
+    }
+  })
+
+  byId.forEach((item) => next.push(item))
+  return normalizeSortOrder(next)
+}
+
 async function persistSortOrder(table, list) {
   const updates = await Promise.all(
     list.map(item => (
@@ -365,6 +381,16 @@ export function DataProvider({ children }) {
     setProducts(prev => {
       reordered = moveByDirection(prev, id, direction)
       return reordered || prev
+    })
+    if (!reordered) return
+    await persistSortOrder('products', reordered)
+  }
+
+  async function reorderProducts(orderedIds) {
+    let reordered = null
+    setProducts(prev => {
+      reordered = reorderByIds(prev, orderedIds)
+      return reordered
     })
     if (!reordered) return
     await persistSortOrder('products', reordered)
@@ -515,6 +541,16 @@ export function DataProvider({ children }) {
     await persistSortOrder('ingredients', reordered)
   }
 
+  async function reorderIngredients(orderedIds) {
+    let reordered = null
+    setIngredients(prev => {
+      reordered = reorderByIds(prev, orderedIds)
+      return reordered
+    })
+    if (!reordered) return
+    await persistSortOrder('ingredients', reordered)
+  }
+
   async function toggleIngredientStock(id) {
     const ingredient = ingredients.find(item => item.id === id)
     if (!ingredient) return
@@ -618,6 +654,7 @@ export function DataProvider({ children }) {
         updateProduct,
         deleteProduct,
         moveProduct,
+        reorderProducts,
         categories,
         addCategory,
         updateCategory,
@@ -628,6 +665,7 @@ export function DataProvider({ children }) {
         deleteIngredient,
         toggleIngredientStock,
         moveIngredient,
+        reorderIngredients,
         orders,
         addOrder,
         updateOrder,

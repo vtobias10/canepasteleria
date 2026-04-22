@@ -57,15 +57,18 @@ function renderPrice(product) {
 }
 
 export default function ProductsManager() {
-  const { products, categories, addProduct, updateProduct, deleteProduct, moveProduct } = useData()
+  const { products, categories, addProduct, updateProduct, deleteProduct, reorderProducts } = useData()
   const [modal, setModal] = useState(null)
   const [confirmDelete, setConfirmDelete] = useState(null)
   const [search, setSearch] = useState('')
+  const [dragProductId, setDragProductId] = useState(null)
+  const [dragOverProductId, setDragOverProductId] = useState(null)
 
   const displayed = products.filter(product =>
     product.name?.toLowerCase().includes(search.toLowerCase()) ||
     product.category?.toLowerCase().includes(search.toLowerCase())
   )
+  const canDragReorder = search.trim() === ''
 
   function handleSave(data) {
     if (data.id) {
@@ -81,6 +84,50 @@ export default function ProductsManager() {
     setConfirmDelete(null)
   }
 
+  function handleDragStart(event, id) {
+    if (!canDragReorder) return
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('text/plain', id)
+    setDragProductId(id)
+  }
+
+  function handleDragOver(event, id) {
+    if (!dragProductId || !canDragReorder) return
+    event.preventDefault()
+    if (dragOverProductId !== id) {
+      setDragOverProductId(id)
+    }
+  }
+
+  function handleDrop(targetId) {
+    if (!dragProductId || !targetId || dragProductId === targetId || !canDragReorder) {
+      setDragProductId(null)
+      setDragOverProductId(null)
+      return
+    }
+
+    const from = products.findIndex(item => item.id === dragProductId)
+    const to = products.findIndex(item => item.id === targetId)
+    if (from === -1 || to === -1) {
+      setDragProductId(null)
+      setDragOverProductId(null)
+      return
+    }
+
+    const next = [...products]
+    const [moved] = next.splice(from, 1)
+    next.splice(to, 0, moved)
+    reorderProducts(next.map(item => item.id))
+
+    setDragProductId(null)
+    setDragOverProductId(null)
+  }
+
+  function handleDragEnd() {
+    setDragProductId(null)
+    setDragOverProductId(null)
+  }
+
   return (
     <div>
       <div className="admin-section-header">
@@ -89,6 +136,11 @@ export default function ProductsManager() {
           <p style={{ color: 'var(--text-light)', fontSize: '0.88rem', marginTop: 4 }}>
             {products.length} producto{products.length !== 1 ? 's' : ''} en total
           </p>
+          {!canDragReorder && (
+            <p style={{ color: 'var(--text-light)', fontSize: '0.76rem', marginTop: 4 }}>
+              Para reordenar, limpia la busqueda.
+            </p>
+          )}
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <input
@@ -105,6 +157,7 @@ export default function ProductsManager() {
         <table className="admin-table">
           <thead>
             <tr>
+              <th className="sort-col-head">Orden</th>
               <th>Producto</th>
               <th>Categoria</th>
               <th>Precios</th>
@@ -116,13 +169,31 @@ export default function ProductsManager() {
           <tbody>
             {displayed.length === 0 && (
               <tr>
-                <td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-light)' }}>
+                <td colSpan={7} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-light)' }}>
                   {products.length === 0 ? 'No hay productos aun' : 'Sin resultados para esa busqueda'}
                 </td>
               </tr>
             )}
             {displayed.map(product => (
-              <tr key={product.id}>
+              <tr
+                key={product.id}
+                className={`sortable-row ${dragProductId === product.id ? 'dragging' : ''} ${dragOverProductId === product.id ? 'drag-over' : ''}`}
+                onDragOver={event => handleDragOver(event, product.id)}
+                onDrop={() => handleDrop(product.id)}
+              >
+                <td className="sort-col-cell">
+                  <button
+                    type="button"
+                    className={`drag-handle ${canDragReorder ? '' : 'disabled'}`}
+                    draggable={canDragReorder}
+                    onDragStart={event => handleDragStart(event, product.id)}
+                    onDragEnd={handleDragEnd}
+                    title={canDragReorder ? 'Arrastrar para reordenar' : 'Limpia la busqueda para reordenar'}
+                    aria-label="Arrastrar para reordenar"
+                  >
+                    ⋮⋮
+                  </button>
+                </td>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     {isEmojiImage(product.emoji) ? (
@@ -165,22 +236,6 @@ export default function ProductsManager() {
                 </td>
                 <td>
                   <div className="table-actions">
-                    <button
-                      className="btn btn-ghost btn-sm"
-                      onClick={() => moveProduct(product.id, 'up')}
-                      disabled={products.findIndex(item => item.id === product.id) === 0}
-                      title="Mover arriba"
-                    >
-                      ↑
-                    </button>
-                    <button
-                      className="btn btn-ghost btn-sm"
-                      onClick={() => moveProduct(product.id, 'down')}
-                      disabled={products.findIndex(item => item.id === product.id) === products.length - 1}
-                      title="Mover abajo"
-                    >
-                      ↓
-                    </button>
                     <button className="btn btn-ghost btn-sm" onClick={() => setModal({ ...product })}>Editar</button>
                     <button className="btn btn-danger btn-sm" onClick={() => setConfirmDelete(product)}>Eliminar</button>
                   </div>
