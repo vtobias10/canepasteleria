@@ -128,6 +128,7 @@
 }
 
 .product-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -135,7 +136,7 @@
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.62);
   width: 100%;
-  transition: transform 0.28s ease, box-shadow 0.2s ease, border-color 0.2s;
+  transition: transform 0.28s ease, box-shadow 0.2s ease, border-color 0.2s, background-color 0.2s;
   overflow: hidden;
   cursor: pointer;
 }
@@ -147,7 +148,54 @@
   background: rgba(255, 255, 255, 0.84);
 }
 
+.product-card-violet-filter {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: linear-gradient(
+    150deg,
+    rgba(139, 95, 173, 0.22) 0%,
+    rgba(184, 150, 212, 0.28) 55%,
+    rgba(212, 184, 232, 0.16) 100%
+  );
+  transition: opacity 0.24s ease;
+}
+
+.product-card-sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  color: rgba(255, 255, 255, 0.86);
+  transition: color 0.24s ease;
+}
+
+.product-card-sparkle {
+  position: absolute;
+  left: var(--sparkle-left);
+  top: var(--sparkle-top);
+  width: var(--sparkle-size);
+  height: var(--sparkle-size);
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+  opacity: 0;
+  animation: productCardSparkle var(--sparkle-duration) ease-in-out infinite;
+  animation-delay: var(--sparkle-delay);
+}
+
+.product-card:hover .product-card-violet-filter {
+  opacity: 0.04;
+}
+
+.product-card:hover .product-card-sparkles {
+  color: rgba(139, 95, 173, 0.84);
+}
+
 .product-card-inner {
+  position: relative;
+  z-index: 3;
   padding: 9px 8px;
   display: flex;
   flex-direction: column;
@@ -155,6 +203,22 @@
   gap: 5px;
   text-align: center;
   min-height: 145px;
+}
+
+@keyframes productCardSparkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  45% {
+    opacity: 0.95;
+    transform: scale(1);
+  }
+  70% {
+    opacity: 0.55;
+    transform: scale(0.75);
+  }
 }
 
 .product-emoji-circle {

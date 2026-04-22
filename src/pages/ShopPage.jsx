@@ -6,6 +6,14 @@ import { getEmojiText, isEmojiImage, normalizeEmojiSrc } from '../utils/emoji'
 import './ShopPage.css'
 
 const PRODUCTS_PER_PAGE = 9
+const CARD_SPARKLES = [
+  { left: '12%', top: '18%', delay: '0s', duration: '2.8s', size: '4px' },
+  { left: '26%', top: '72%', delay: '0.45s', duration: '3.2s', size: '5px' },
+  { left: '42%', top: '34%', delay: '0.8s', duration: '2.6s', size: '4px' },
+  { left: '58%', top: '14%', delay: '1.2s', duration: '3.1s', size: '6px' },
+  { left: '76%', top: '56%', delay: '1.6s', duration: '2.9s', size: '4px' },
+  { left: '88%', top: '28%', delay: '2s', duration: '3.3s', size: '5px' },
+]
 
 const WaIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={{ flexShrink: 0 }}>
@@ -32,7 +40,11 @@ function ProductPrice({ product }) {
   const hasSale = discountedPrice !== null && discountedPrice > 0
 
   if (!hasPrice && !hasSale) {
-    return null
+    return (
+      <span className="product-price-line">
+        <span className="product-price-sale">CONSULTAR PRECIO</span>
+      </span>
+    )
   }
 
   if (hasPrice && hasSale && discountedPrice < regularPrice) {
@@ -109,6 +121,22 @@ export default function ShopPage() {
               style={{ animationDelay: `${index * 0.08}s` }}
               onClick={() => setSelectedProduct(product)}
             >
+              <div className="product-card-violet-filter" aria-hidden="true" />
+              <div className="product-card-sparkles" aria-hidden="true">
+                {CARD_SPARKLES.map((sparkle, sparkleIndex) => (
+                  <span
+                    key={`${product.id}-sparkle-${sparkleIndex}`}
+                    className="product-card-sparkle"
+                    style={{
+                      '--sparkle-left': sparkle.left,
+                      '--sparkle-top': sparkle.top,
+                      '--sparkle-delay': sparkle.delay,
+                      '--sparkle-duration': sparkle.duration,
+                      '--sparkle-size': sparkle.size,
+                    }}
+                  />
+                ))}
+              </div>
               <div className="product-card-inner">
                 <div className="product-emoji-circle">
                   {isEmojiImage(product.emoji) ? (
