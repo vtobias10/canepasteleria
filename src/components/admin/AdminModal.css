@@ -186,50 +186,74 @@
 
 @media (max-height: 820px) {
   .admin-modal-overlay {
-    padding-top: 8px;
-    padding-bottom: 8px;
+    padding-top: 6px;
+    padding-bottom: 6px;
   }
 
   .admin-modal {
-    max-height: min(96vh, 900px) !important;
+    max-height: min(98vh, 900px) !important;
   }
 
   .admin-modal-body {
-    max-height: calc(min(96vh, 900px) - 108px) !important;
-    padding: 10px 14px;
+    max-height: calc(min(98vh, 900px) - 96px) !important;
+    padding: 8px 13px;
   }
 
   .admin-modal-header {
-    padding: 10px 16px 9px;
+    padding: 8px 14px 7px;
   }
 
   .admin-modal-heading h3 {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 
   .admin-modal-footer {
-    padding: 8px 16px;
+    padding: 6px 14px;
   }
 
   .admin-modal-section {
-    padding: 10px;
+    padding: 8px 10px;
   }
 
   .admin-modal-section + .admin-modal-section {
-    margin-top: 8px;
+    margin-top: 6px;
   }
 
   .admin-modal .form-group {
-    margin-bottom: 7px;
+    margin-bottom: 5px;
   }
 
   .admin-modal-section-title {
-    margin-bottom: 7px;
+    margin-bottom: 5px;
+    font-size: 0.66rem;
   }
 
   .admin-modal-grid-2,
   .admin-modal-grid-3 {
-    gap: 8px;
+    gap: 6px;
+  }
+
+  /* inputs y labels más compactos dentro de modales */
+  .admin-modal input,
+  .admin-modal select {
+    padding: 5px 8px;
+    font-size: 0.8rem;
+  }
+
+  .admin-modal textarea {
+    padding: 5px 8px;
+    font-size: 0.8rem;
+    min-height: 54px;
+  }
+
+  .admin-modal label {
+    font-size: 0.64rem;
+    margin-bottom: 2px;
+  }
+
+  .admin-modal .btn.btn-sm {
+    padding: 5px 11px;
+    font-size: 0.7rem;
   }
 }
 

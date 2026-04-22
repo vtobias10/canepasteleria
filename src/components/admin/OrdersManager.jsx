@@ -237,8 +237,8 @@ export default function OrdersManager() {
 
               <div className="order-row-actions">
                 <StatusSelect value={order.status} onChange={status => quickStatus(order, status)} />
-                <button className="btn btn-ghost btn-sm" onClick={() => setViewOrder(order)}><EyeIcon /> Ver</button>
-                <button className="btn btn-ghost btn-sm" onClick={() => setModal({ ...order })}><EditIcon /> Editar</button>
+                <button className="btn btn-ghost btn-sm" onClick={() => setViewOrder(order)}><EyeIcon /><span className="btn-label"> Ver</span></button>
+                <button className="btn btn-ghost btn-sm" onClick={() => setModal({ ...order })}><EditIcon /><span className="btn-label"> Editar</span></button>
                 <button className="btn btn-danger btn-sm" onClick={() => setConfirmDelete(order)}><TrashIcon /></button>
               </div>
             </div>

@@ -422,19 +422,36 @@
 
 @media (max-height: 820px) {
   .product-variant-grid {
-    max-height: min(22vh, 200px);
+    max-height: min(18vh, 160px);
   }
 
   .product-description-input {
-    min-height: 80px;
+    min-height: 62px;
   }
 
   .product-modal-layout {
-    gap: 7px;
+    gap: 6px;
   }
 
   .product-modal-top-row {
-    gap: 7px;
+    gap: 6px;
+  }
+
+  .product-media-editor-fixed {
+    min-height: 70px;
+  }
+
+  .product-image-editor {
+    width: 70px;
+    height: 70px;
+  }
+
+  .product-modal-form .admin-modal-section {
+    padding: 8px 10px;
+  }
+
+  .product-modal-form .form-group {
+    margin-bottom: 5px;
   }
 }
 
