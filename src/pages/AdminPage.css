@@ -318,6 +318,12 @@
     flex-direction: column;
     flex-wrap: nowrap;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Let nav shrink so footer is always reachable by scrolling */
+  .admin-sidebar .admin-nav {
+    flex: none;
   }
 
   .admin-sidebar.open {
@@ -326,15 +332,21 @@
   }
 
   .admin-wrapper {
+    display: block;
     height: 100vh;
     overflow: hidden;
+    position: relative;
   }
 
-  /* Main: full height scroll container, offset by fixed header */
+  /* Main: absolute fill below the fixed header — guaranteed scroll on iOS */
   .admin-main {
+    position: absolute;
+    top: 52px;
+    left: 0;
+    right: 0;
+    bottom: 0;
     margin-left: 0;
-    margin-top: 52px;
-    height: calc(100vh - 52px);
+    height: auto;
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
   }
