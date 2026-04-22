@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useData } from '../../context/DataContext'
 import SocialIcon, { SOCIAL_PLATFORMS, getSocialPlatformInfo } from '../common/SocialIcon'
+import { CheckIcon, XIcon, PlusIcon, TrashIcon } from './AdminIcons'
 import './ConfigManager.css'
 
 const WaIcon = ({ size = 18 }) => (
@@ -260,7 +261,7 @@ export default function ConfigManager() {
                   <span className="social-link-icon"><SocialIcon platform={link.platform} /></span>
                   <span className="social-link-label">{platformInfo(link.platform).label}</span>
                   <a href={link.url} target="_blank" rel="noopener noreferrer" className="social-link-url">{link.url}</a>
-                  <button type="button" className="btn btn-danger btn-sm" onClick={() => removeSocialLink(index)}>✕</button>
+                  <button type="button" className="btn btn-danger btn-sm" onClick={() => removeSocialLink(index)}><TrashIcon /></button>
                 </div>
               ))}
             </div>
@@ -268,7 +269,7 @@ export default function ConfigManager() {
 
           {!showAddSocial ? (
             <button type="button" className="btn btn-ghost btn-sm social-add-trigger" onClick={() => setShowAddSocial(true)}>
-              + Agregar red social
+              <PlusIcon /> Agregar red social
             </button>
           ) : (
             <div className="social-add-panel">
@@ -296,10 +297,10 @@ export default function ConfigManager() {
               />
               <div className="social-panel-actions">
                 <button type="button" className="btn btn-ghost btn-sm" onClick={() => { setShowAddSocial(false); setNewUrl('') }}>
-                  Cancelar
+                  <XIcon /> Cancelar
                 </button>
                 <button type="button" className="btn btn-primary btn-sm" onClick={addSocialLink}>
-                  Agregar
+                  <CheckIcon /> Agregar
                 </button>
               </div>
             </div>
@@ -334,7 +335,7 @@ export default function ConfigManager() {
         </div>
 
         <div className="config-save-bar">
-          <button type="submit" className="btn btn-primary config-save-btn">Guardar configuracion</button>
+          <button type="submit" className="btn btn-primary config-save-btn"><CheckIcon /> Guardar configuracion</button>
           {saved && <span className="save-label">✓ Guardado</span>}
         </div>
       </form>

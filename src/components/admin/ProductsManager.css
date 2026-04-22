@@ -110,20 +110,16 @@
 }
 
 .product-modal-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-  gap: 12px;
-  align-items: start;
-}
-
-.product-modal-left-col {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
-.product-modal-right {
-  height: 100%;
+.product-modal-top-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  align-items: start;
 }
 
 .product-modal-form .admin-modal-section {
@@ -146,7 +142,8 @@
 }
 
 .product-description-input {
-  min-height: 52px;
+  min-height: 112px;
+  resize: none;
 }
 
 .product-media-mode-switch {
@@ -159,6 +156,20 @@
 .add-variant-row .btn.btn-sm {
   padding: 5px 10px;
   font-size: 0.68rem;
+}
+
+.product-media-desc-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.product-media-editor-fixed {
+  margin-top: 6px;
+  min-height: 86px;
+  display: flex;
+  align-items: flex-start;
 }
 
 .product-media-editor-row {
@@ -277,18 +288,20 @@
 }
 
 .product-status-field {
-  min-height: 36px;
   border: 1.5px solid var(--lilac-mid);
   border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.85);
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0 10px;
-  font-size: 0.8rem;
+  padding: 7px 10px;
+  font-size: 0.83rem;
   font-weight: 700;
   color: var(--text-dark);
   margin: 0;
+  cursor: pointer;
+  min-height: 38px;
+  box-sizing: border-box;
 }
 
 .product-status-field input[type='checkbox'] {
@@ -352,10 +365,10 @@
 
 .product-variant-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   margin-bottom: 0;
-  max-height: min(40vh, 360px);
+  max-height: min(28vh, 240px);
   overflow-y: auto;
   padding-right: 2px;
 }
@@ -407,13 +420,18 @@
   border-color: transparent !important;
 }
 
-@media (max-width: 1020px) {
-  .product-modal-layout {
+@media (max-width: 860px) {
+  .product-modal-top-row {
+    grid-template-columns: 1fr;
+  }
+
+  .product-media-desc-row {
     grid-template-columns: 1fr;
   }
 
   .product-variant-grid {
-    max-height: min(36vh, 360px);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-height: min(36vh, 300px);
   }
 }
 

@@ -3,6 +3,7 @@ import { useData } from '../../context/DataContext'
 import ChipInput from './ChipInput'
 import { AdminModal, ConfirmModal } from './AdminModal'
 import { getEmojiText } from '../../utils/emoji'
+import { CheckIcon, XIcon, PlusIcon, TrashIcon, SparkleIcon, EyeIcon, EditIcon } from './AdminIcons'
 import './OrdersManager.css'
 
 const STATUS_OPTIONS = ['Pendiente', 'En preparación', 'Listo', 'Entregado', 'Cancelado']
@@ -12,6 +13,19 @@ const STATUS_BADGES = {
   Listo: 'badge-green',
   Entregado: 'badge-green',
   Cancelado: 'badge-red',
+}
+
+function formatDelivery(deliveryDate) {
+  if (!deliveryDate) return null
+  if (deliveryDate.type === 'coordinar') return '📅 A coordinar'
+  if (deliveryDate.value) {
+    const date = new Date(`${deliveryDate.value}T00:00:00`)
+    const dateText = date.toLocaleDateString('es-AR', { weekday: 'short', day: '2-digit', month: 'short' })
+    const timeIcons = { mañana: '🌅 Mañana', tarde: '☀️ Tarde', noche: '🌙 Noche' }
+    const timeText = deliveryDate.timeOfDay ? ` · ${timeIcons[deliveryDate.timeOfDay]}` : ''
+    return `📆 ${dateText}${timeText}`
+  }
+  return null
 }
 
 const emptyItem = () => ({
@@ -40,6 +54,7 @@ const emptyOrder = {
 export default function OrdersManager() {
   const { orders, addOrder, updateOrder, deleteOrder } = useData()
   const [modal, setModal] = useState(null)
+  const [viewOrder, setViewOrder] = useState(null)
   const [filterStatus, setFilterStatus] = useState('all')
   const [confirmDelete, setConfirmDelete] = useState(null)
   const [search, setSearch] = useState('')
@@ -48,11 +63,13 @@ export default function OrdersManager() {
     ? orders
     : orders.filter(order => order.status === filterStatus)
 
-  const filtered = search.trim()
+  const searchClean = search.trim().replace(/^#/, '')
+  const filtered = searchClean
     ? byStatus.filter(order =>
-      order.customerName?.toLowerCase().includes(search.toLowerCase()) ||
-      order.phone?.includes(search) ||
-      order.tags?.some(tag => tag.toLowerCase().includes(search.toLowerCase()))
+      order.customerName?.toLowerCase().includes(searchClean.toLowerCase()) ||
+      order.phone?.includes(searchClean) ||
+      order.tags?.some(tag => tag.toLowerCase().includes(searchClean.toLowerCase())) ||
+      (order.orderNumber && String(order.orderNumber).includes(searchClean))
     )
     : byStatus
 
@@ -71,21 +88,6 @@ export default function OrdersManager() {
     updateOrder(order.id, { ...order, status })
   }
 
-  function formatDelivery(deliveryDate) {
-    if (!deliveryDate) return null
-    if (deliveryDate.type === 'coordinar') return '📅 A coordinar'
-
-    if (deliveryDate.value) {
-      const date = new Date(`${deliveryDate.value}T00:00:00`)
-      const dateText = date.toLocaleDateString('es-AR', { weekday: 'short', day: '2-digit', month: 'short' })
-      const timeIcons = { mañana: '🌅 Mañana', tarde: '☀️ Tarde', noche: '🌙 Noche' }
-      const timeText = deliveryDate.timeOfDay ? ` · ${timeIcons[deliveryDate.timeOfDay]}` : ''
-      return `📆 ${dateText}${timeText}`
-    }
-
-    return null
-  }
-
   return (
     <div>
       <div className="admin-section-header">
@@ -99,11 +101,11 @@ export default function OrdersManager() {
           <input
             value={search}
             onChange={event => setSearch(event.target.value)}
-            placeholder="Buscar cliente, tel..."
-            style={{ padding: '7px 12px', fontSize: '0.85rem', borderRadius: 8, border: '1.5px solid var(--lilac-mid)', background: 'rgba(255,255,255,0.8)', width: 200 }}
+            placeholder="Buscar cliente, tel, #nro..."
+            style={{ padding: '7px 12px', fontSize: '0.85rem', borderRadius: 8, border: '1.5px solid var(--lilac-mid)', background: 'rgba(255,255,255,0.8)', width: 210 }}
           />
           <button className="btn btn-primary" onClick={() => setModal({ ...emptyOrder, orderItems: [emptyItem()] })}>
-            + Nuevo pedido
+            <PlusIcon /> Nuevo pedido
           </button>
         </div>
       </div>
@@ -137,109 +139,57 @@ export default function OrdersManager() {
           </div>
         )}
 
-        {sorted.map(order => (
-          <div key={order.id} className="order-card card fade-up">
-            <div className="order-card-header">
-              <div className="order-customer">
-                <span className="order-avatar">
-                  {order.customerName?.charAt(0)?.toUpperCase() || '?'}
-                </span>
-                <div>
-                  <strong>{order.customerName || 'Sin nombre'}</strong>
-                  {order.phone && (
-                    <a
-                      href={`https://wa.me/${order.phone.replace(/\D/g, '')}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="order-phone"
-                    >
-                      💬 {order.phone}
-                    </a>
-                  )}
-                  {order.address && <span className="order-address">📍 {order.address}</span>}
-                </div>
+        {sorted.map(order => {
+          const delivery = formatDelivery(order.deliveryDate)
+          const itemCount = order.orderItems?.length || 0
+          return (
+            <div key={order.id} className="order-row card fade-up">
+              <div className="order-row-avatar">{order.customerName?.charAt(0)?.toUpperCase() || '?'}</div>
+
+              <div className="order-row-number">
+                #{String(order.orderNumber || '?').padStart(3, '0')}
               </div>
 
-              <div className="order-meta">
-                <span className={`badge ${STATUS_BADGES[order.status] || 'badge-purple'}`}>
-                  {order.status}
-                </span>
-                {order.deliveryDate && <span className="order-delivery">{formatDelivery(order.deliveryDate)}</span>}
-                <span className="order-date">
-                  {order.date ? new Date(order.date).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' }) : ''}
-                </span>
+              <div className="order-row-main">
+                <strong className="order-row-name">{order.customerName || 'Sin nombre'}</strong>
+                {order.phone && <span className="order-row-phone">📱 {order.phone}</span>}
               </div>
-            </div>
 
-            <div className="order-body">
-              {order.orderItems?.length > 0 && (
-                <div className="order-items-display">
-                  {order.orderItems.map((item, index) => (
-                    <div key={index} className="order-item-row">
-                      <span className="order-item-qty">×{item.quantity}</span>
-                      <div className="order-item-info">
-                        <span className="order-item-name">
-                          {item.type === 'custom' ? `✏️ ${item.customName}` : item.productName}
-                        </span>
-                        {item.type === 'product' && Object.entries(item.variantSelections || {}).length > 0 && (
-                          <span className="order-item-variants">
-                            {Object.entries(item.variantSelections).map(([key, value]) => `${key}: ${value}`).join(' · ')}
-                            {item.bolsitasXUd ? ` · Bolsitas: ${item.bolsitasXUd}` : ''}
-                          </span>
-                        )}
-                        {item.type === 'custom' && item.customDetails && (
-                          <span className="order-item-variants">{item.customDetails}</span>
-                        )}
-                      </div>
-                    </div>
+              <div className="order-row-meta">
+                <span className={`badge ${STATUS_BADGES[order.status] || 'badge-purple'}`}>{order.status}</span>
+                {delivery && <span className="order-row-delivery">{delivery}</span>}
+              </div>
+
+              <div className="order-row-count">
+                {itemCount} prod{itemCount !== 1 ? 's' : '.'}
+              </div>
+
+              <div className="order-row-actions">
+                <select
+                  className="status-select"
+                  value={order.status}
+                  onChange={event => quickStatus(order, event.target.value)}
+                >
+                  {STATUS_OPTIONS.map(status => (
+                    <option key={status} value={status}>{status}</option>
                   ))}
-                </div>
-              )}
-
-              {!order.orderItems?.length && order.products && (
-                <div className="order-detail">
-                  <span className="order-detail-label">Pedido:</span>
-                  <span>{order.products}</span>
-                </div>
-              )}
-
-              {order.notes && (
-                <div className="order-detail">
-                  <span className="order-detail-label">Notas:</span>
-                  <span>{order.notes}</span>
-                </div>
-              )}
-
-              {order.tags?.length > 0 && (
-                <div className="chips-list" style={{ marginTop: 8 }}>
-                  {order.tags.map(tag => <span key={tag} className="chip">{tag}</span>)}
-                </div>
-              )}
-            </div>
-
-            <div className="order-card-footer">
-              <select
-                className="status-select"
-                value={order.status}
-                onChange={event => quickStatus(order, event.target.value)}
-              >
-                {STATUS_OPTIONS.map(status => (
-                  <option key={status} value={status}>{status}</option>
-                ))}
-              </select>
-
-              <div style={{ display: 'flex', gap: 6 }}>
-                <button className="btn btn-ghost btn-sm" onClick={() => setModal({ ...order })}>
-                  Editar
-                </button>
-                <button className="btn btn-danger btn-sm" onClick={() => setConfirmDelete(order)}>
-                  Eliminar
-                </button>
+                </select>
+                <button className="btn btn-ghost btn-sm" onClick={() => setViewOrder(order)}><EyeIcon /> Ver</button>
+                <button className="btn btn-ghost btn-sm" onClick={() => setModal({ ...order })}><EditIcon /> Editar</button>
+                <button className="btn btn-danger btn-sm" onClick={() => setConfirmDelete(order)}><TrashIcon /></button>
               </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
+
+      {viewOrder && (
+        <OrderViewModal
+          order={viewOrder}
+          onClose={() => setViewOrder(null)}
+          onEdit={() => { setModal({ ...viewOrder }); setViewOrder(null) }}
+        />
+      )}
 
       {modal !== null && (
         <OrderFormModal
@@ -267,6 +217,89 @@ export default function OrdersManager() {
         />
       )}
     </div>
+  )
+}
+
+function OrderViewModal({ order, onClose, onEdit }) {
+  const delivery = formatDelivery(order.deliveryDate)
+  const itemCount = order.orderItems?.length || 0
+
+  const orderLabel = order.orderNumber ? ` #${String(order.orderNumber).padStart(3, '0')}` : ''
+  return (
+    <AdminModal
+      title={`Detalle del pedido${orderLabel}`}
+      size="medium"
+      onClose={onClose}
+      actions={(
+        <>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}><XIcon /> Cerrar</button>
+          <button type="button" className="btn btn-primary btn-sm" onClick={onEdit}><CheckIcon /> Editar pedido</button>
+        </>
+      )}
+    >
+      <div className="order-view-grid">
+        <div className="admin-modal-section order-view-section">
+          <div className="admin-modal-section-title">Cliente</div>
+          <div className="order-view-field"><span className="order-view-label">Nombre</span><span>{order.customerName || '—'}</span></div>
+          <div className="order-view-field"><span className="order-view-label">Teléfono</span><span>{order.phone || '—'}</span></div>
+          <div className="order-view-field"><span className="order-view-label">Dirección</span><span>{order.address || '—'}</span></div>
+        </div>
+
+        <div className="admin-modal-section order-view-section">
+          <div className="admin-modal-section-title">Entrega y estado</div>
+          <div className="order-view-field">
+            <span className="order-view-label">Entrega</span>
+            <span>{delivery || 'A coordinar'}</span>
+          </div>
+          <div className="order-view-field">
+            <span className="order-view-label">Estado</span>
+            <span className={`badge ${(order.status === 'Pendiente' ? 'badge-yellow' : order.status === 'En preparación' ? 'badge-purple' : order.status === 'Listo' || order.status === 'Entregado' ? 'badge-green' : 'badge-red')}`}>
+              {order.status}
+            </span>
+          </div>
+          {order.tags?.length > 0 && (
+            <div className="order-view-field">
+              <span className="order-view-label">Etiquetas</span>
+              <span className="order-view-chips">
+                {order.tags.map(tag => <span key={tag} className="chip">{tag}</span>)}
+              </span>
+            </div>
+          )}
+          {order.notes && (
+            <div className="order-view-field order-view-field--block">
+              <span className="order-view-label">Notas</span>
+              <span className="order-view-notes">{order.notes}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="admin-modal-section" style={{ marginTop: 10 }}>
+        <div className="admin-modal-section-title">Productos ({itemCount})</div>
+        <div className="order-view-items">
+          {order.orderItems?.map((item, index) => {
+            const variants = item.variantSelections
+              ? Object.entries(item.variantSelections).filter(([, v]) => v).map(([k, v]) => `${k}: ${v}`).join(' · ')
+              : ''
+            return (
+              <div key={item._key || index} className="order-view-item">
+                <span className="order-view-item-qty">×{item.quantity}</span>
+                <div className="order-view-item-info">
+                  <span className="order-view-item-name">
+                    {item.type === 'custom' ? (item.customName || 'Personalizado') : (item.productName || '—')}
+                  </span>
+                  {variants && <span className="order-view-item-variants">{variants}</span>}
+                  {item.bolsitasXUd && <span className="order-view-item-variants">Bolsitas: {item.bolsitasXUd}</span>}
+                  {item.type === 'custom' && item.customDetails && (
+                    <span className="order-view-item-variants">{item.customDetails}</span>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </AdminModal>
   )
 }
 
@@ -331,175 +364,128 @@ function OrderFormModal({ initial, onSave, onClose }) {
 
   return (
     <AdminModal
-      title={form.id ? 'Editar pedido' : 'Nuevo pedido'}
-      subtitle="Diseño unificado con bloques compactos para cargar toda la información de un vistazo."
+      title={form.id ? `Editar pedido${form.orderNumber ? ` #${String(form.orderNumber).padStart(3, '0')}` : ''}` : 'Nuevo pedido'}
       size="wide"
       onClose={onClose}
       actions={(
         <>
-          <button type="button" className="btn btn-ghost" onClick={onClose}>Cancelar</button>
-          <button type="submit" form={formId} className="btn btn-primary">
-            {form.id ? 'Guardar cambios' : 'Crear pedido'}
+          <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}><XIcon /> Cancelar</button>
+          <button type="submit" form={formId} className="btn btn-primary btn-sm">
+            {form.id ? <><CheckIcon /> Guardar cambios</> : <><SparkleIcon /> Crear pedido</>}
           </button>
         </>
       )}
     >
       <form id={formId} onSubmit={handleSubmit}>
-        <div className="order-form-layout">
-          <div className="order-column">
-            <section className="admin-modal-section">
-              <div className="admin-modal-section-title">Cliente</div>
-              <div className="admin-modal-grid-2">
-                <div className="form-group">
-                  <label>Nombre</label>
-                  <input
-                    value={form.customerName}
-                    onChange={event => set('customerName', event.target.value)}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Teléfono / WhatsApp</label>
-                  <input
-                    value={form.phone}
-                    onChange={event => set('phone', event.target.value)}
-                  />
-                </div>
-              </div>
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label>Dirección</label>
-                <input
-                  value={form.address}
-                  onChange={event => set('address', event.target.value)}
-                />
-              </div>
-            </section>
-
-            <section className="admin-modal-section">
-              <div className="admin-modal-section-title">Entrega</div>
-              <div className="delivery-options">
-                <label className={`delivery-opt ${form.deliveryDate.type === 'coordinar' ? 'selected' : ''}`}>
-                  <input
-                    type="radio"
-                    name="deliveryType"
-                    value="coordinar"
-                    checked={form.deliveryDate.type === 'coordinar'}
-                    onChange={() => set('deliveryDate', { type: 'coordinar', value: '' })}
-                  />
-                  <span>📅 A coordinar</span>
-                </label>
-
-                <label className={`delivery-opt ${form.deliveryDate.type === 'date' ? 'selected' : ''}`}>
-                  <input
-                    type="radio"
-                    name="deliveryType"
-                    value="date"
-                    checked={form.deliveryDate.type === 'date'}
-                    onChange={() => set('deliveryDate', { type: 'date', value: '' })}
-                  />
-                  <span>📆 Fecha específica</span>
-                </label>
-              </div>
-
-              {form.deliveryDate.type === 'date' && (
-                <div className="delivery-date-expanded">
-                  <div className="form-group" style={{ marginBottom: 10 }}>
-                    <label>Fecha</label>
-                    <input
-                      type="date"
-                      className="date-input-styled"
-                      value={form.deliveryDate.value}
-                      onChange={event => set('deliveryDate', { ...form.deliveryDate, value: event.target.value })}
-                      min={new Date().toISOString().split('T')[0]}
-                    />
-                  </div>
-
-                  {form.deliveryDate.value && (
-                    <div className="form-group" style={{ marginBottom: 0 }}>
-                      <label>Horario</label>
-                      <div className="time-options">
-                        {[
-                          { val: '', label: 'Sin especificar', icon: '🕐' },
-                          { val: 'mañana', label: 'Mañana', icon: '🌅' },
-                          { val: 'tarde', label: 'Tarde', icon: '☀️' },
-                          { val: 'noche', label: 'Noche', icon: '🌙' },
-                        ].map(option => (
-                          <label
-                            key={option.val}
-                            className={`time-opt ${(form.deliveryDate.timeOfDay || '') === option.val ? 'selected' : ''}`}
-                          >
-                            <input
-                              type="radio"
-                              name="timeOfDay"
-                              value={option.val}
-                              checked={(form.deliveryDate.timeOfDay || '') === option.val}
-                              onChange={() => set('deliveryDate', { ...form.deliveryDate, timeOfDay: option.val })}
-                            />
-                            <span>{option.icon} {option.label}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </section>
-          </div>
-
-          <section className="admin-modal-section order-products-section">
-            <div className="admin-modal-inline" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
-              <div className="admin-modal-section-title" style={{ marginBottom: 0 }}>Productos del pedido</div>
-              <button type="button" className="btn btn-ghost btn-sm" onClick={addItem}>
-                + Agregar
-              </button>
+        <div className="order-form-top">
+          <section className="admin-modal-section">
+            <div className="admin-modal-section-title">Cliente</div>
+            <div className="form-group">
+              <label>Nombre</label>
+              <input value={form.customerName} onChange={event => set('customerName', event.target.value)} />
             </div>
-
-            <div className="order-items-table">
-              {form.orderItems.map(item => (
-                <OrderItemRow
-                  key={item._key}
-                  item={item}
-                  products={products}
-                  onProductSelect={productId => handleProductSelect(item._key, productId)}
-                  onUpdate={patch => updateItem(item._key, patch)}
-                  onRemove={() => removeItem(item._key)}
-                  canRemove={form.orderItems.length > 1}
-                />
-              ))}
+            <div className="form-group">
+              <label>Teléfono / WhatsApp</label>
+              <input value={form.phone} onChange={event => set('phone', event.target.value)} />
+            </div>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label>Dirección</label>
+              <input value={form.address} onChange={event => set('address', event.target.value)} />
             </div>
           </section>
 
-          <div className="order-column">
-            <section className="admin-modal-section">
-              <div className="admin-modal-section-title">Estado y seguimiento</div>
-
-              <div className="form-group">
-                <label>Estado</label>
-                <select value={form.status} onChange={event => set('status', event.target.value)}>
-                  {STATUS_OPTIONS.map(status => (
-                    <option key={status} value={status}>{status}</option>
-                  ))}
-                </select>
+          <section className="admin-modal-section">
+            <div className="admin-modal-section-title">Entrega</div>
+            <div className="delivery-options">
+              <label className={`delivery-opt ${form.deliveryDate.type === 'coordinar' ? 'selected' : ''}`}>
+                <input type="radio" name="deliveryType" value="coordinar"
+                  checked={form.deliveryDate.type === 'coordinar'}
+                  onChange={() => set('deliveryDate', { type: 'coordinar', value: '' })} />
+                <span>📅 A coordinar</span>
+              </label>
+              <label className={`delivery-opt ${form.deliveryDate.type === 'date' ? 'selected' : ''}`}>
+                <input type="radio" name="deliveryType" value="date"
+                  checked={form.deliveryDate.type === 'date'}
+                  onChange={() => set('deliveryDate', { type: 'date', value: '' })} />
+                <span>📆 Fecha específica</span>
+              </label>
+            </div>
+            {form.deliveryDate.type === 'date' && (
+              <div className="delivery-date-expanded" style={{ marginTop: 10 }}>
+                <div className="form-group" style={{ marginBottom: 8 }}>
+                  <label>Fecha</label>
+                  <input type="date" className="date-input-styled"
+                    value={form.deliveryDate.value}
+                    onChange={event => set('deliveryDate', { ...form.deliveryDate, value: event.target.value })}
+                    min={new Date().toISOString().split('T')[0]} />
+                </div>
+                {form.deliveryDate.value && (
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label>Horario</label>
+                    <div className="time-options">
+                      {[
+                        { val: '', label: 'Sin especificar', icon: '🕐' },
+                        { val: 'mañana', label: 'Mañana', icon: '🌅' },
+                        { val: 'tarde', label: 'Tarde', icon: '☀️' },
+                        { val: 'noche', label: 'Noche', icon: '🌙' },
+                      ].map(option => (
+                        <label key={option.val}
+                          className={`time-opt ${(form.deliveryDate.timeOfDay || '') === option.val ? 'selected' : ''}`}>
+                          <input type="radio" name="timeOfDay" value={option.val}
+                            checked={(form.deliveryDate.timeOfDay || '') === option.val}
+                            onChange={() => set('deliveryDate', { ...form.deliveryDate, timeOfDay: option.val })} />
+                          <span>{option.icon} {option.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
+            )}
+          </section>
 
-              <div className="form-group">
-                <label>Etiquetas</label>
-                <ChipInput
-                  chips={form.tags || []}
-                  onChange={tags => set('tags', tags)}
-                  placeholder="Agregar + Enter"
-                />
-              </div>
-
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label>Notas</label>
-                <textarea
-                  value={form.notes}
-                  onChange={event => set('notes', event.target.value)}
-                />
-              </div>
-            </section>
-          </div>
+          <section className="admin-modal-section">
+            <div className="admin-modal-section-title">Estado y seguimiento</div>
+            <div className="form-group">
+              <label>Estado</label>
+              <select value={form.status} onChange={event => set('status', event.target.value)}>
+                {STATUS_OPTIONS.map(status => (
+                  <option key={status} value={status}>{status}</option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Etiquetas</label>
+              <ChipInput chips={form.tags || []} onChange={tags => set('tags', tags)} placeholder="Agregar + Enter" />
+            </div>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label>Notas</label>
+              <textarea value={form.notes} onChange={event => set('notes', event.target.value)} />
+            </div>
+          </section>
         </div>
+
+        <section className="admin-modal-section order-products-section">
+          <div className="admin-modal-inline" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
+            <div className="admin-modal-section-title" style={{ marginBottom: 0 }}>Productos del pedido</div>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={addItem}>
+              <PlusIcon /> Agregar
+            </button>
+          </div>
+          <div className="order-items-table">
+            {form.orderItems.map(item => (
+              <OrderItemRow
+                key={item._key}
+                item={item}
+                products={products}
+                onProductSelect={productId => handleProductSelect(item._key, productId)}
+                onUpdate={patch => updateItem(item._key, patch)}
+                onRemove={() => removeItem(item._key)}
+                canRemove={form.orderItems.length > 1}
+              />
+            ))}
+          </div>
+        </section>
       </form>
     </AdminModal>
   )
@@ -541,7 +527,7 @@ function OrderItemRow({ item, products, onProductSelect, onUpdate, onRemove, can
 
         {canRemove && (
           <button type="button" className="btn btn-danger btn-sm remove-item-btn" onClick={onRemove} aria-label="Quitar producto">
-            ✕
+            <TrashIcon />
           </button>
         )}
       </div>

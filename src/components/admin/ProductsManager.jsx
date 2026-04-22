@@ -3,6 +3,7 @@ import { useData } from '../../context/DataContext'
 import ChipInput from './ChipInput'
 import { AdminModal, ConfirmModal } from './AdminModal'
 import { getEmojiText, isEmojiImage, normalizeEmojiSrc } from '../../utils/emoji'
+import { CheckIcon, XIcon, PlusIcon, TrashIcon, SparkleIcon } from './AdminIcons'
 import './ProductsManager.css'
 
 const EMOJI_OPTIONS = [
@@ -196,7 +197,7 @@ export default function ProductsManager() {
             placeholder="Buscar producto..."
             style={{ padding: '7px 12px', fontSize: '0.85rem', borderRadius: 8, border: '1.5px solid var(--lilac-mid)', background: 'rgba(255,255,255,0.8)', width: 200 }}
           />
-          <button className="btn btn-primary" onClick={() => setModal({ ...emptyProduct })}>+ Nuevo producto</button>
+          <button className="btn btn-primary" onClick={() => setModal({ ...emptyProduct })}><PlusIcon /> Nuevo producto</button>
         </div>
       </div>
 
@@ -467,21 +468,20 @@ function ProductFormModal({ initial, categories, onSave, onClose }) {
     <>
       <AdminModal
         title={form.id ? 'Editar producto' : 'Nuevo producto'}
-        subtitle="Estructura flexible para cualquier formato de venta."
-        size="xwide"
+        size="wide"
         onClose={onClose}
         actions={(
           <>
-            <button type="button" className="btn btn-ghost" onClick={onClose}>Cancelar</button>
-            <button type="submit" form={formId} className="btn btn-primary">
-              {form.id ? 'Guardar cambios' : 'Crear producto'}
+            <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}><XIcon /> Cancelar</button>
+            <button type="submit" form={formId} className="btn btn-primary btn-sm">
+              {form.id ? <><CheckIcon /> Guardar cambios</> : <><SparkleIcon /> Crear producto</>}
             </button>
           </>
         )}
       >
         <form id={formId} onSubmit={handleSubmit} className="product-modal-form">
           <div className="product-modal-layout">
-            <div className="product-modal-left-col">
+            <div className="product-modal-top-row">
               <section className="admin-modal-section">
                 <div className="admin-modal-section-title">Ficha del producto</div>
 
@@ -510,92 +510,93 @@ function ProductFormModal({ initial, categories, onSave, onClose }) {
                   </div>
                 </div>
 
-                <div className="form-group">
-                  <label>Imagen / Icono</label>
-                  <div className="product-media-mode-switch">
-                    <button
-                      type="button"
-                      className={`btn btn-sm ${mediaMode === 'image' ? 'btn-primary' : 'btn-ghost'}`}
-                      onClick={switchToImageMode}
-                    >
-                      Imagen
-                    </button>
-                    <button
-                      type="button"
-                      className={`btn btn-sm ${mediaMode === 'emoji' ? 'btn-primary' : 'btn-ghost'}`}
-                      onClick={switchToEmojiMode}
-                    >
-                      Icono
-                    </button>
-                  </div>
-
-                  <div className="product-media-editor-row">
-                    {mediaMode === 'image' ? (
-                      <div className={`product-image-editor ${form.imageUrl ? 'has-image' : ''}`}>
-                        {form.imageUrl ? (
-                          <img src={form.imageUrl} alt="Vista previa del producto" className="product-image-editor-img" />
-                        ) : (
-                          <span className="product-image-editor-placeholder">Sin imagen</span>
-                        )}
-                        <input
-                          id={fileInputId}
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageSelected}
-                          style={{ display: 'none' }}
-                        />
-                        <button
-                          type="button"
-                          className="product-image-editor-action edit"
-                          aria-label="Editar imagen"
-                          onClick={openImagePicker}
-                        >
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                            <path d="M12 20h9" />
-                            <path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
-                          </svg>
-                        </button>
-                        {form.imageUrl && (
+                <div className="product-media-desc-row">
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label>Imagen / Icono</label>
+                    <div className="product-media-mode-switch">
+                      <button
+                        type="button"
+                        className={`btn btn-sm ${mediaMode === 'image' ? 'btn-primary' : 'btn-ghost'}`}
+                        onClick={switchToImageMode}
+                      >
+                        Imagen
+                      </button>
+                      <button
+                        type="button"
+                        className={`btn btn-sm ${mediaMode === 'emoji' ? 'btn-primary' : 'btn-ghost'}`}
+                        onClick={switchToEmojiMode}
+                      >
+                        Icono
+                      </button>
+                    </div>
+                    <div className="product-media-editor-fixed">
+                      {mediaMode === 'image' ? (
+                        <div className={`product-image-editor ${form.imageUrl ? 'has-image' : ''}`}>
+                          {form.imageUrl ? (
+                            <img src={form.imageUrl} alt="Vista previa del producto" className="product-image-editor-img" />
+                          ) : (
+                            <span className="product-image-editor-placeholder">Sin imagen</span>
+                          )}
+                          <input
+                            id={fileInputId}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageSelected}
+                            style={{ display: 'none' }}
+                          />
                           <button
                             type="button"
-                            className="product-image-editor-action remove"
-                            aria-label="Quitar imagen"
-                            onClick={clearImage}
+                            className="product-image-editor-action edit"
+                            aria-label="Editar imagen"
+                            onClick={openImagePicker}
                           >
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                              <path d="M3 6h18" />
-                              <path d="M8 6V4h8v2" />
-                              <path d="M19 6l-1 14H6L5 6" />
-                              <path d="M10 11v6M14 11v6" />
+                              <path d="M12 20h9" />
+                              <path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
                             </svg>
                           </button>
-                        )}
-                      </div>
-                    ) : (
-                      <button type="button" className="product-emoji-picker-trigger" onClick={() => setEmojiPickerOpen(true)}>
-                        {isEmojiImage(form.emoji) ? (
-                          <img
-                            src={normalizeEmojiSrc(form.emoji)}
-                            alt="Icono seleccionado"
-                            className="product-emoji-picker-preview-img"
-                          />
-                        ) : (
-                          <span className="product-emoji-picker-preview-text">{getEmojiText(form.emoji, DEFAULT_EMOJI)}</span>
-                        )}
-                        <span>Elegir icono</span>
-                      </button>
-                    )}
+                          {form.imageUrl && (
+                            <button
+                              type="button"
+                              className="product-image-editor-action remove"
+                              aria-label="Quitar imagen"
+                              onClick={clearImage}
+                            >
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                                <path d="M3 6h18" />
+                                <path d="M8 6V4h8v2" />
+                                <path d="M19 6l-1 14H6L5 6" />
+                                <path d="M10 11v6M14 11v6" />
+                              </svg>
+                            </button>
+                          )}
+                        </div>
+                      ) : (
+                        <button type="button" className="product-emoji-picker-trigger" onClick={() => setEmojiPickerOpen(true)}>
+                          {isEmojiImage(form.emoji) ? (
+                            <img
+                              src={normalizeEmojiSrc(form.emoji)}
+                              alt="Icono seleccionado"
+                              className="product-emoji-picker-preview-img"
+                            />
+                          ) : (
+                            <span className="product-emoji-picker-preview-text">{getEmojiText(form.emoji, DEFAULT_EMOJI)}</span>
+                          )}
+                          <span>Elegir icono</span>
+                        </button>
+                      )}
+                    </div>
+                    {imageError && <span className="admin-modal-help" style={{ color: '#b44747' }}>{imageError}</span>}
                   </div>
-                  {imageError && <span className="admin-modal-help" style={{ color: '#b44747' }}>{imageError}</span>}
-                </div>
 
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label>Descripcion</label>
-                  <textarea
-                    className="product-description-input"
-                    value={form.description}
-                    onChange={event => set('description', event.target.value)}
-                  />
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label>Descripcion</label>
+                    <textarea
+                      className="product-description-input"
+                      value={form.description}
+                      onChange={event => set('description', event.target.value)}
+                    />
+                  </div>
                 </div>
               </section>
 
@@ -661,7 +662,7 @@ function ProductFormModal({ initial, categories, onSave, onClose }) {
               </section>
             </div>
 
-            <section className="admin-modal-section product-modal-right">
+            <section className="admin-modal-section">
               <div className="admin-modal-section-title">Formato de venta y opciones</div>
 
               <div className="product-variant-suggestions">
@@ -698,7 +699,7 @@ function ProductFormModal({ initial, categories, onSave, onClose }) {
                           onChange={event => updateVariantName(index, event.target.value)}
                         />
                         <button type="button" className="btn btn-danger btn-sm" onClick={() => removeVariant(index)}>
-                          Quitar
+                          <TrashIcon />
                         </button>
                       </div>
                       <ChipInput

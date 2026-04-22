@@ -1,3 +1,4 @@
+import { XIcon, TrashIcon, CheckIcon } from './AdminIcons'
 import './AdminModal.css'
 
 export function AdminModal({
@@ -69,15 +70,15 @@ export function ConfirmModal({
       onClose={onCancel}
       actions={(
         <>
-          <button type="button" className="btn btn-ghost" onClick={onCancel}>
-            {cancelLabel}
+          <button type="button" className="btn btn-ghost btn-sm" onClick={onCancel}>
+            <XIcon /> {cancelLabel}
           </button>
           <button
             type="button"
-            className={tone === 'danger' ? 'btn btn-danger' : 'btn btn-primary'}
+            className={`btn btn-sm ${tone === 'danger' ? 'btn-danger' : 'btn-primary'}`}
             onClick={onConfirm}
           >
-            {confirmLabel}
+            {tone === 'danger' ? <TrashIcon /> : <CheckIcon />} {confirmLabel}
           </button>
         </>
       )}

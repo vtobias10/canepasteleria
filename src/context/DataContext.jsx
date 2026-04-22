@@ -104,6 +104,7 @@ function stripMissingIngredientFields(payload, errorMessage = '') {
 
 const toOrder = (row) => ({
   id: row.id,
+  orderNumber: row.order_number ?? null,
   customerName: row.customer_name ?? row.client_name ?? '',
   phone: row.phone,
   address: row.address,
@@ -117,6 +118,7 @@ const toOrder = (row) => ({
 
 const fromOrder = (order) => ({
   id: order.id,
+  order_number: order.orderNumber ?? null,
   client_name: order.customerName ?? order.clientName ?? '',
   phone: order.phone,
   address: order.address,
@@ -541,9 +543,16 @@ export function DataProvider({ children }) {
   }
 
   async function addOrder(order) {
-    const newOrder = { ...order, id: crypto.randomUUID(), date: new Date().toISOString() }
+    const maxNum = orders.reduce((max, o) => Math.max(max, o.orderNumber || 0), 0)
+    const newOrder = { ...order, id: crypto.randomUUID(), date: new Date().toISOString(), orderNumber: maxNum + 1 }
     setOrders(prev => [newOrder, ...prev])
-    const { error: addError } = await supabase.from('orders').insert(fromOrder(newOrder))
+    const payload = fromOrder(newOrder)
+    let { error: addError } = await supabase.from('orders').insert(payload)
+    if (addError && addError.message?.toLowerCase().includes('order_number')) {
+      const { order_number, ...rest } = payload
+      const fallback = await supabase.from('orders').insert(rest)
+      addError = fallback.error
+    }
     if (addError) console.error('addOrder:', addError)
   }
 

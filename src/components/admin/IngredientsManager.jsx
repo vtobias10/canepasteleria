@@ -1,6 +1,7 @@
 ﻿import { useState } from 'react'
 import { useData } from '../../context/DataContext'
 import { ConfirmModal } from './AdminModal'
+import { CheckIcon, XIcon, PlusIcon, TrashIcon } from './AdminIcons'
 import './IngredientsManager.css'
 
 function moveIdRelative(ids, draggingId, targetId, position) {
@@ -120,7 +121,7 @@ export default function IngredientsManager() {
         <div>
           <h2>Ingredientes</h2>
           <p style={{ color: 'var(--text-light)', fontSize: '0.88rem', marginTop: 4 }}>
-            {inStock.length} disponibles Â· <span style={{ color: outOfStock.length > 0 ? '#c05050' : 'inherit' }}>
+            {inStock.length} disponibles · <span style={{ color: outOfStock.length > 0 ? '#c05050' : 'inherit' }}>
               {outOfStock.length} faltantes
             </span>
           </p>
@@ -143,7 +144,7 @@ export default function IngredientsManager() {
               className={`btn btn-sm ${filter === value ? 'btn-primary' : 'btn-ghost'}`}
               onClick={() => setFilter(value)}
             >
-              {value === 'all' ? 'Todos' : value === 'inStock' ? 'âœ“ En stock' : 'âœ• Faltantes'}
+              {value === 'all' ? 'Todos' : value === 'inStock' ? '✓ En stock' : '✕ Faltantes'}
             </button>
           ))}
         </div>
@@ -151,7 +152,7 @@ export default function IngredientsManager() {
 
       {outOfStock.length > 0 && (
         <div className="stock-alert card fade-up">
-          <span className="alert-icon">âš ï¸</span>
+          <span className="alert-icon">⚠️</span>
           <div>
             <strong>Ingredientes faltantes:</strong>
             <span style={{ color: 'var(--text-mid)', marginLeft: 6 }}>
@@ -168,7 +169,7 @@ export default function IngredientsManager() {
           placeholder="Nombre del ingrediente"
           style={{ flex: 1 }}
         />
-        <button type="submit" className="btn btn-primary btn-sm">+ Agregar</button>
+        <button type="submit" className="btn btn-primary btn-sm"><PlusIcon /> Agregar</button>
       </form>
 
       <div className="ingredients-list card fade-up">
@@ -230,10 +231,10 @@ export default function IngredientsManager() {
                 className="btn btn-ghost btn-sm"
                 onClick={() => (editId === ingredient.id ? saveEdit(ingredient.id) : startEdit(ingredient))}
               >
-                {editId === ingredient.id ? 'Guardar' : 'Editar'}
+                {editId === ingredient.id ? <><CheckIcon /> Guardar</> : 'Editar'}
               </button>
               <button className="btn btn-danger btn-sm" onClick={() => setConfirmDelete(ingredient)}>
-                âœ•
+                <TrashIcon />
               </button>
             </div>
           </div>
