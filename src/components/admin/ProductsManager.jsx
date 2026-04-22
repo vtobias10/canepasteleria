@@ -3,7 +3,7 @@ import { useData } from '../../context/DataContext'
 import ChipInput from './ChipInput'
 import { AdminModal, ConfirmModal } from './AdminModal'
 import { getEmojiText, isEmojiImage, normalizeEmojiSrc } from '../../utils/emoji'
-import { CheckIcon, XIcon, PlusIcon, TrashIcon, SparkleIcon } from './AdminIcons'
+import { CheckIcon, XIcon, PlusIcon, TrashIcon, SparkleIcon, EditIcon } from './AdminIcons'
 import './ProductsManager.css'
 
 const EMOJI_OPTIONS = [
@@ -290,8 +290,8 @@ export default function ProductsManager() {
                 </td>
                 <td>
                   <div className="table-actions">
-                    <button className="btn btn-ghost btn-sm" onClick={() => setModal({ ...product })}>Editar</button>
-                    <button className="btn btn-danger btn-sm" onClick={() => setConfirmDelete(product)}>Eliminar</button>
+                    <button className="btn btn-ghost btn-sm" onClick={() => setModal({ ...product })}><EditIcon /><span className="btn-label"> Editar</span></button>
+                    <button className="btn btn-danger btn-sm" onClick={() => setConfirmDelete(product)}><TrashIcon /><span className="btn-label"> Eliminar</span></button>
                   </div>
                 </td>
               </tr>

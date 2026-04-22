@@ -2,6 +2,7 @@
   display: flex;
   height: 100vh;
   overflow: hidden;
+  position: relative;
 }
 
 /* ─── Sidebar — fixed ─────────────────── */
@@ -134,6 +135,22 @@
   flex: 1;
 }
 
+@media (max-width: 1100px) {
+  .admin-table th,
+  .admin-table td {
+    padding: 9px 10px;
+    font-size: 0.84rem;
+  }
+
+  .table-actions .btn-label {
+    display: none;
+  }
+
+  .table-actions .btn.btn-sm {
+    padding: 5px 8px;
+  }
+}
+
 @media (max-height: 820px) {
   .admin-sidebar {
     padding: 14px 12px;
@@ -179,11 +196,86 @@
 }
 
 @media (max-width: 700px) {
-  .admin-wrapper { flex-direction: column; height: auto; overflow: auto; }
-  .admin-sidebar { width: 100%; height: auto; position: static; flex-direction: row; flex-wrap: wrap; }
-  .admin-main { margin-left: 0; height: auto; }
-  .admin-nav { flex-direction: row; }
-  .admin-content { padding: 20px 16px; }
+  /* Show mobile header */
+  .admin-mobile-header {
+    display: flex;
+  }
+
+  /* Sidebar becomes a slide-in drawer */
+  .admin-sidebar {
+    position: fixed;
+    left: -280px;
+    top: 0;
+    width: 260px;
+    height: 100vh;
+    z-index: 170;
+    padding: 20px 14px;
+    transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-direction: column;
+    flex-wrap: nowrap;
+    overflow-y: auto;
+  }
+
+  .admin-sidebar.open {
+    left: 0;
+    box-shadow: 4px 0 32px rgba(74, 45, 110, 0.25);
+  }
+
+  .admin-sidebar-overlay {
+    display: block;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s;
+  }
+
+  /* overlay shown when sidebar is open — controlled via JS rendering */
+  .admin-sidebar-overlay {
+    display: block;
+    pointer-events: all;
+  }
+
+  /* Main shifts down to clear fixed header */
+  .admin-main {
+    margin-left: 0;
+    padding-top: 50px;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .admin-content {
+    padding: 16px 14px;
+  }
+
+  .admin-section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .admin-section-header > div:last-child {
+    width: 100%;
+  }
+
+  .admin-section-header input[type='text'],
+  .admin-section-header input[placeholder] {
+    width: 100% !important;
+  }
+
+  /* Tables scroll horizontally on mobile */
+  .card[style*='overflow'] {
+    overflow-x: auto !important;
+  }
+
+  .admin-table {
+    min-width: 560px;
+  }
+
+  /* Hide complex columns on very small screens */
+  .admin-table .sort-col-head,
+  .admin-table .sort-col-cell {
+    display: none;
+  }
 }
 
 /* ─── Shared admin styles ─────────────── */
@@ -225,5 +317,61 @@
 .table-actions {
   display: flex;
   gap: 6px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+/* ─── Mobile header & hamburger ──────────── */
+.admin-mobile-header {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  z-index: 150;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(14px);
+  border-bottom: 1.5px solid rgba(212, 184, 232, 0.45);
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.admin-mobile-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-light);
+}
+
+.admin-hamburger {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(212, 184, 232, 0.6);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--lilac-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.18s;
+}
+
+.admin-hamburger:hover {
+  background: var(--lilac-bg);
+  border-color: var(--lilac-deep);
+}
+
+.admin-sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(74, 45, 110, 0.38);
+  backdrop-filter: blur(3px);
+  z-index: 160;
 }
