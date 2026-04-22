@@ -543,8 +543,8 @@ function OrderItemRow({ item, products, onProductSelect, onUpdate, onRemove, can
         </div>
 
         {canRemove && (
-          <button type="button" className="btn btn-danger btn-sm remove-item-btn" onClick={onRemove}>
-            Quitar
+          <button type="button" className="btn btn-danger btn-sm remove-item-btn" onClick={onRemove} aria-label="Quitar producto">
+            ✕
           </button>
         )}
       </div>

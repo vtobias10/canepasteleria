@@ -21,19 +21,27 @@
   cursor: url('https://cdn.cursors-4u.net/previews/light-purple-pointer-8920f32f-32.webp') 41 38, auto !important;
 }
 
-html, body, #root {
+html {
   height: 100%;
   overflow: hidden;
-}
-
-body {
-  font-family: 'Lato', sans-serif;
+  overscroll-behavior: none;
+  background-color: var(--lilac-bg);
   background-image: url('/background.png');
   background-size: cover;
   background-position: top center;
   background-attachment: fixed;
   background-repeat: no-repeat;
-  background-color: var(--lilac-bg);
+}
+
+body, #root {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  font-family: 'Lato', sans-serif;
+  background: transparent;
   color: var(--text-dark);
 }
 
@@ -180,7 +188,7 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 0 0 3px rgba(139, 95, 173, 0.12);
 }
 
-textarea { resize: vertical; min-height: 80px; }
+textarea { resize: none; min-height: 80px; }
 
 label {
   display: block;
