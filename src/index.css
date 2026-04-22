@@ -403,8 +403,11 @@ textarea,
 
 button:disabled,
 .btn:disabled,
-[disabled] {
+input:disabled,
+[disabled],
+[aria-disabled='true'] {
   cursor: not-allowed !important;
+  pointer-events: auto !important;
 }
 
 .hachitec-watermark {

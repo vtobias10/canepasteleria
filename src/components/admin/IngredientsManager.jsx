@@ -125,11 +125,6 @@ export default function IngredientsManager() {
               {outOfStock.length} faltantes
             </span>
           </p>
-          {!canDragReorder && (
-            <p style={{ color: 'var(--text-light)', fontSize: '0.76rem', marginTop: 4 }}>
-              Para reordenar, usa filtro "Todos" y limpia la busqueda.
-            </p>
-          )}
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
           <input

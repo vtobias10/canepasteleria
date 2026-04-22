@@ -5,11 +5,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   padding: 12px 18px;
   position: relative;
   z-index: 1;
   gap: 8px;
+}
+
+/* Safe centering: spacers collapse when content overflows so top is never cut off */
+.shop-outer::before,
+.shop-outer::after {
+  content: '';
+  flex: 1;
+  min-height: 0;
 }
 
 .shop-topbar {
@@ -375,7 +382,19 @@
 
 .pagination .btn:disabled {
   opacity: 0.4;
-  cursor: not-allowed;
+}
+
+.pagination-nav-btn {
+  font-family: 'Cormorant Garamond', serif !important;
+  font-size: 0.88rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: none !important;
+  gap: 5px;
+}
+
+.pagination-label {
+  font-family: 'Cormorant Garamond', serif;
 }
 
 .shop-topbar-right {
@@ -505,7 +524,6 @@
   .shop-outer {
     padding: 8px 18px;
     gap: 6px;
-    justify-content: flex-start;
   }
 
   .shop-card {

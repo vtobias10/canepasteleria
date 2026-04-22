@@ -54,8 +54,8 @@ export default function AdminPage() {
         <button className="admin-hamburger" onClick={() => setSidebarOpen(o => !o)} aria-label="Menú">
           <HamburgerIcon />
         </button>
-        <img src={config.logoUrl || '/logo.jpeg'} alt="Cane" className="admin-brand-logo" style={{ width: 30, height: 30 }} />
         <span className="admin-mobile-title">Panel Admin</span>
+        <img src={config.logoUrl || '/logo.jpeg'} alt="Cane" className="admin-brand-logo" style={{ width: 30, height: 30, marginLeft: 'auto' }} />
       </header>
 
       {/* Overlay backdrop */}

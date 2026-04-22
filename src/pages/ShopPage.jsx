@@ -114,7 +114,6 @@ export default function ShopPage() {
       <div className="shop-card fade-up">
         <div className="shop-card-header">
           <h2>Nuestra Carta</h2>
-          <p className="shop-subtitle">Elegi tu favorito y mira el detalle en el modal</p>
         </div>
 
         {categories.length > 2 && (
@@ -202,11 +201,11 @@ export default function ShopPage() {
         {totalPages > 1 && (
           <div className="pagination">
             <button
-              className="btn btn-ghost btn-sm"
+              className="btn btn-ghost btn-sm pagination-nav-btn"
               onClick={() => setPage(prev => Math.max(0, prev - 1))}
               disabled={page === 0}
             >
-              {'\u2190'} Ant
+              {'\u2190'} <span className="pagination-label">Anterior</span>
             </button>
             <div className="page-dots">
               {Array.from({ length: totalPages }, (_, idx) => (
@@ -218,11 +217,11 @@ export default function ShopPage() {
               ))}
             </div>
             <button
-              className="btn btn-ghost btn-sm"
+              className="btn btn-ghost btn-sm pagination-nav-btn"
               onClick={() => setPage(prev => Math.min(totalPages - 1, prev + 1))}
               disabled={page === totalPages - 1}
             >
-              Sig {'\u2192'}
+              <span className="pagination-label">Siguiente</span> {'\u2192'}
             </button>
           </div>
         )}

@@ -323,16 +323,28 @@
     box-shadow: 4px 0 32px rgba(74, 45, 110, 0.28);
   }
 
-  /* Main: no left margin, scroll below fixed header */
+  /* Override global overflow:hidden so page scrolls naturally on mobile */
+  html, body, #root {
+    overflow-y: auto !important;
+    height: auto !important;
+    min-height: 100%;
+  }
+
+  .admin-wrapper {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  /* Main: no left margin, natural scroll */
   .admin-main {
     margin-left: 0;
-    height: 100vh;
-    overflow-y: auto;
-    overflow-x: hidden;
+    height: auto;
+    overflow: visible;
   }
 
   .admin-content {
-    padding: 68px 14px 32px;
+    padding: 68px 14px 48px;
   }
 
   .admin-section-header {
