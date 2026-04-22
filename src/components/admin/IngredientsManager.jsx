@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useData } from '../../context/DataContext'
+import { ConfirmModal } from './AdminModal'
 import './IngredientsManager.css'
 
 export default function IngredientsManager() {
@@ -7,22 +8,25 @@ export default function IngredientsManager() {
   const [newName, setNewName] = useState('')
   const [editId, setEditId] = useState(null)
   const [editName, setEditName] = useState('')
-  const [filter, setFilter] = useState('all') // all | inStock | outOfStock
+  const [filter, setFilter] = useState('all')
+  const [search, setSearch] = useState('')
+  const [confirmDelete, setConfirmDelete] = useState(null)
 
-  const outOfStock = ingredients.filter(i => !i.inStock)
-  const inStock = ingredients.filter(i => i.inStock)
-  const filtered = filter === 'all' ? ingredients : filter === 'inStock' ? inStock : outOfStock
+  const outOfStock = ingredients.filter(item => !item.inStock)
+  const inStock = ingredients.filter(item => item.inStock)
+  const byFilter = filter === 'all' ? ingredients : filter === 'inStock' ? inStock : outOfStock
+  const filtered = byFilter.filter(item => item.name.toLowerCase().includes(search.toLowerCase()))
 
-  function handleAdd(e) {
-    e.preventDefault()
+  function handleAdd(event) {
+    event.preventDefault()
     if (!newName.trim()) return
     addIngredient({ name: newName.trim(), inStock: true })
     setNewName('')
   }
 
-  function startEdit(i) {
-    setEditId(i.id)
-    setEditName(i.name)
+  function startEdit(ingredient) {
+    setEditId(ingredient.id)
+    setEditName(ingredient.name)
   }
 
   function saveEdit(id) {
@@ -41,14 +45,20 @@ export default function IngredientsManager() {
             </span>
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          {['all', 'inStock', 'outOfStock'].map(f => (
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+          <input
+            value={search}
+            onChange={event => setSearch(event.target.value)}
+            placeholder="Buscar ingrediente..."
+            style={{ padding: '7px 12px', fontSize: '0.85rem', borderRadius: 8, border: '1.5px solid var(--lilac-mid)', background: 'rgba(255,255,255,0.8)', width: 200 }}
+          />
+          {['all', 'inStock', 'outOfStock'].map(value => (
             <button
-              key={f}
-              className={`btn btn-sm ${filter === f ? 'btn-primary' : 'btn-ghost'}`}
-              onClick={() => setFilter(f)}
+              key={value}
+              className={`btn btn-sm ${filter === value ? 'btn-primary' : 'btn-ghost'}`}
+              onClick={() => setFilter(value)}
             >
-              {f === 'all' ? 'Todos' : f === 'inStock' ? '✓ En stock' : '✗ Faltantes'}
+              {value === 'all' ? 'Todos' : value === 'inStock' ? '✓ En stock' : '✕ Faltantes'}
             </button>
           ))}
         </div>
@@ -60,7 +70,7 @@ export default function IngredientsManager() {
           <div>
             <strong>Ingredientes faltantes:</strong>
             <span style={{ color: 'var(--text-mid)', marginLeft: 6 }}>
-              {outOfStock.map(i => i.name).join(', ')}
+              {outOfStock.map(item => item.name).join(', ')}
             </span>
           </div>
         </div>
@@ -69,7 +79,7 @@ export default function IngredientsManager() {
       <form className="add-ingredient-form card fade-up" onSubmit={handleAdd}>
         <input
           value={newName}
-          onChange={e => setNewName(e.target.value)}
+          onChange={event => setNewName(event.target.value)}
           placeholder="Nombre del ingrediente"
           style={{ flex: 1 }}
         />
@@ -82,11 +92,9 @@ export default function IngredientsManager() {
             No hay ingredientes en esta categoría
           </div>
         )}
+
         {filtered.map(ingredient => (
-          <div
-            key={ingredient.id}
-            className={`ingredient-row ${!ingredient.inStock ? 'out-of-stock' : ''}`}
-          >
+          <div key={ingredient.id} className={`ingredient-row ${!ingredient.inStock ? 'out-of-stock' : ''}`}>
             <label className="ingredient-check">
               <input
                 type="checkbox"
@@ -101,9 +109,9 @@ export default function IngredientsManager() {
               {editId === ingredient.id ? (
                 <input
                   value={editName}
-                  onChange={e => setEditName(e.target.value)}
+                  onChange={event => setEditName(event.target.value)}
                   onBlur={() => saveEdit(ingredient.id)}
-                  onKeyDown={e => e.key === 'Enter' && saveEdit(ingredient.id)}
+                  onKeyDown={event => event.key === 'Enter' && saveEdit(ingredient.id)}
                   autoFocus
                   style={{ padding: '4px 8px', fontSize: '0.9rem' }}
                 />
@@ -118,20 +126,35 @@ export default function IngredientsManager() {
             <div className="ingredient-actions">
               <button
                 className="btn btn-ghost btn-sm"
-                onClick={() => editId === ingredient.id ? saveEdit(ingredient.id) : startEdit(ingredient)}
+                onClick={() => (editId === ingredient.id ? saveEdit(ingredient.id) : startEdit(ingredient))}
               >
                 {editId === ingredient.id ? 'Guardar' : 'Editar'}
               </button>
-              <button
-                className="btn btn-danger btn-sm"
-                onClick={() => deleteIngredient(ingredient.id)}
-              >
+              <button className="btn btn-danger btn-sm" onClick={() => setConfirmDelete(ingredient)}>
                 ✕
               </button>
             </div>
           </div>
         ))}
       </div>
+
+      {confirmDelete && (
+        <ConfirmModal
+          title="¿Eliminar ingrediente?"
+          message={(
+            <>
+              Se eliminará <strong>{confirmDelete.name}</strong> del inventario. Esta acción no se puede deshacer.
+            </>
+          )}
+          onCancel={() => setConfirmDelete(null)}
+          onConfirm={() => {
+            deleteIngredient(confirmDelete.id)
+            setConfirmDelete(null)
+          }}
+          confirmLabel="Eliminar"
+          tone="danger"
+        />
+      )}
     </div>
   )
 }

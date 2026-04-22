@@ -71,7 +71,6 @@ export default function AdminPage() {
       </aside>
 
       <main className="admin-main">
-        <div className="lace-border" style={{ position: 'static', marginBottom: 0 }} />
         <div className="admin-content">
           <Routes>
             <Route index element={<Navigate to="productos" />} />

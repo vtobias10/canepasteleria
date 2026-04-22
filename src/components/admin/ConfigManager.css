@@ -43,6 +43,11 @@
   line-height: 1.5;
 }
 
+.config-error {
+  color: #b44747;
+  font-weight: 700;
+}
+
 /* ─── Input with prefix ───────────────── */
 .input-prefix-wrap {
   display: flex;

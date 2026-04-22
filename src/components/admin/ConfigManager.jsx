@@ -27,6 +27,7 @@ export default function ConfigManager() {
   const [showAddSocial, setShowAddSocial] = useState(false)
   const [newPlatform, setNewPlatform] = useState('instagram')
   const [newUrl, setNewUrl] = useState('')
+  const [logoError, setLogoError] = useState('')
 
   function set(key, val) {
     setForm(prev => ({ ...prev, [key]: val }))
@@ -43,7 +44,11 @@ export default function ConfigManager() {
   function handleLogoUpload(e) {
     const file = e.target.files[0]
     if (!file) return
-    if (file.size > 800000) { alert('La imagen es muy grande. Máximo 800KB.'); return }
+    if (file.size > 800000) {
+      setLogoError('La imagen supera el máximo permitido (800KB).')
+      return
+    }
+    setLogoError('')
     const reader = new FileReader()
     reader.onload = ev => set('logoUrl', ev.target.result)
     reader.readAsDataURL(file)
@@ -93,6 +98,7 @@ export default function ConfigManager() {
                 <input type="file" accept="image/*" onChange={handleLogoUpload} style={{ display: 'none' }} />
               </label>
               <p className="field-hint">PNG, JPG o WEBP · máx 800KB · se verá circular</p>
+              {logoError && <p className="field-hint config-error">{logoError}</p>}
               {form.logoUrl !== '/logo.jpeg' && (
                 <button type="button" className="btn btn-ghost btn-sm" style={{ marginTop: 8 }} onClick={() => set('logoUrl', '/logo.jpeg')}>
                   Restaurar original

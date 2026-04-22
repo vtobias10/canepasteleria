@@ -1,0 +1,88 @@
+import './AdminModal.css'
+
+export function AdminModal({
+  title,
+  subtitle,
+  onClose,
+  size = 'wide',
+  actions = null,
+  closeOnOverlay = true,
+  children,
+}) {
+  const sizeStyles = {
+    compact: { width: 'min(92vw, 460px)', maxWidth: 'none' },
+    medium: { width: 'min(92vw, 760px)', maxWidth: 'none' },
+    wide: { width: 'min(95vw, 1180px)', maxWidth: 'none' },
+    xwide: { width: 'min(96vw, 1460px)', maxWidth: 'none' },
+  }
+
+  function handleOverlayClick(event) {
+    if (closeOnOverlay && event.target === event.currentTarget) {
+      onClose()
+    }
+  }
+
+  return (
+    <div className="modal-overlay admin-modal-overlay fade-in" onClick={handleOverlayClick}>
+      <div
+        className={`modal admin-modal admin-modal--${size}`}
+        style={sizeStyles[size] || sizeStyles.wide}
+        onClick={event => event.stopPropagation()}
+      >
+        <div className="admin-modal-header">
+          <div className="admin-modal-heading">
+            <h3>{title}</h3>
+            {subtitle && <p>{subtitle}</p>}
+          </div>
+          <button type="button" className="admin-modal-close" onClick={onClose} aria-label="Cerrar">
+            ×
+          </button>
+        </div>
+
+        <div className="admin-modal-body">
+          {children}
+        </div>
+
+        {actions && (
+          <div className="admin-modal-footer">
+            {actions}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+export function ConfirmModal({
+  title,
+  message,
+  onCancel,
+  onConfirm,
+  confirmLabel = 'Confirmar',
+  cancelLabel = 'Cancelar',
+  tone = 'danger',
+}) {
+  return (
+    <AdminModal
+      title={title}
+      size="compact"
+      onClose={onCancel}
+      actions={(
+        <>
+          <button type="button" className="btn btn-ghost" onClick={onCancel}>
+            {cancelLabel}
+          </button>
+          <button
+            type="button"
+            className={tone === 'danger' ? 'btn btn-danger' : 'btn btn-primary'}
+            onClick={onConfirm}
+          >
+            {confirmLabel}
+          </button>
+        </>
+      )}
+    >
+      <p className="admin-confirm-message">{message}</p>
+    </AdminModal>
+  )
+}
