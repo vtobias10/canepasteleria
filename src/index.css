@@ -12,13 +12,15 @@
   --shadow-md: rgba(139, 95, 173, 0.25);
   --radius: 16px;
   --radius-sm: 8px;
+  --cursor-default: url('/cursors/normal-select.cur'), auto;
+  --cursor-pointer: url('/cursors/link-select.cur'), pointer;
+  --cursor-text: url('/cursors/text-select.cur'), text;
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  cursor: url('https://cdn.cursors-4u.net/previews/light-purple-pointer-8920f32f-32.webp') 41 38, auto !important;
 }
 
 html {
@@ -43,6 +45,37 @@ body {
   font-family: 'Lato', sans-serif;
   background: transparent;
   color: var(--text-dark);
+}
+
+html,
+body,
+#root {
+  cursor: var(--cursor-default);
+}
+
+a,
+button,
+[role='button'],
+summary,
+select,
+input[type='button'],
+input[type='submit'],
+input[type='reset'],
+input[type='checkbox'],
+input[type='radio'],
+.btn,
+.admin-nav-link,
+.category-tab,
+.page-dot,
+.product-card,
+.emoji-btn,
+.variant-opt {
+  cursor: var(--cursor-pointer);
+}
+
+input:not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']),
+textarea {
+  cursor: var(--cursor-text);
 }
 
 /* ─── Lace border top ─────────────────── */
@@ -335,3 +368,41 @@ label {
 
 .fade-up { animation: fadeUp 0.5s ease forwards; }
 .fade-in { animation: fadeIn 0.3s ease forwards; }
+
+/* Force custom cursors over component-level cursor declarations */
+a,
+button,
+[role='button'],
+summary,
+label,
+select,
+option,
+input[type='button'],
+input[type='submit'],
+input[type='reset'],
+input[type='checkbox'],
+input[type='radio'],
+.btn,
+.admin-nav-link,
+.category-tab,
+.page-dot,
+.product-card,
+.emoji-btn,
+.variant-opt,
+.table-actions button {
+  cursor: var(--cursor-pointer) !important;
+}
+
+input:not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']),
+textarea,
+[contenteditable='true'],
+.chip-input-wrapper,
+.chip-text-input {
+  cursor: var(--cursor-text) !important;
+}
+
+button:disabled,
+.btn:disabled,
+[disabled] {
+  cursor: not-allowed !important;
+}
