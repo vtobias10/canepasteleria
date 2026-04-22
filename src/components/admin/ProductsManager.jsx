@@ -374,7 +374,6 @@ function ProductFormModal({ initial, categories, onSave, onClose }) {
 
   function switchToImageMode() {
     setMediaMode('image')
-    set('emoji', '')
     setImageError('')
   }
 
@@ -403,7 +402,6 @@ function ProductFormModal({ initial, categories, onSave, onClose }) {
     const reader = new FileReader()
     reader.onload = () => {
       set('imageUrl', String(reader.result || ''))
-      set('emoji', '')
       setMediaMode('image')
       setImageError('')
     }
