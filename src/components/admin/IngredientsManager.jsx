@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { useData } from '../../context/DataContext'
 import { ConfirmModal } from './AdminModal'
 import './IngredientsManager.css'
@@ -120,7 +120,7 @@ export default function IngredientsManager() {
         <div>
           <h2>Ingredientes</h2>
           <p style={{ color: 'var(--text-light)', fontSize: '0.88rem', marginTop: 4 }}>
-            {inStock.length} disponibles · <span style={{ color: outOfStock.length > 0 ? '#c05050' : 'inherit' }}>
+            {inStock.length} disponibles Â· <span style={{ color: outOfStock.length > 0 ? '#c05050' : 'inherit' }}>
               {outOfStock.length} faltantes
             </span>
           </p>
@@ -143,7 +143,7 @@ export default function IngredientsManager() {
               className={`btn btn-sm ${filter === value ? 'btn-primary' : 'btn-ghost'}`}
               onClick={() => setFilter(value)}
             >
-              {value === 'all' ? 'Todos' : value === 'inStock' ? '✓ En stock' : '✕ Faltantes'}
+              {value === 'all' ? 'Todos' : value === 'inStock' ? 'âœ“ En stock' : 'âœ• Faltantes'}
             </button>
           ))}
         </div>
@@ -151,7 +151,7 @@ export default function IngredientsManager() {
 
       {outOfStock.length > 0 && (
         <div className="stock-alert card fade-up">
-          <span className="alert-icon">⚠️</span>
+          <span className="alert-icon">âš ï¸</span>
           <div>
             <strong>Ingredientes faltantes:</strong>
             <span style={{ color: 'var(--text-mid)', marginLeft: 6 }}>
@@ -194,7 +194,7 @@ export default function IngredientsManager() {
               title={canDragReorder ? 'Arrastrar para reordenar' : 'Limpia la busqueda para reordenar'}
               aria-label="Arrastrar para reordenar"
             >
-              ⋮⋮
+              <span className="ingredient-drag-handle-icon" aria-hidden="true" />
             </button>
 
             <label className="ingredient-check">
@@ -233,7 +233,7 @@ export default function IngredientsManager() {
                 {editId === ingredient.id ? 'Guardar' : 'Editar'}
               </button>
               <button className="btn btn-danger btn-sm" onClick={() => setConfirmDelete(ingredient)}>
-                ✕
+                âœ•
               </button>
             </div>
           </div>
@@ -242,7 +242,7 @@ export default function IngredientsManager() {
 
       {confirmDelete && (
         <ConfirmModal
-          title="¿Eliminar ingrediente?"
+          title="Â¿Eliminar ingrediente?"
           message={(
             <>
               Se eliminara <strong>{confirmDelete.name}</strong> del inventario. Esta accion no se puede deshacer.
@@ -260,3 +260,5 @@ export default function IngredientsManager() {
     </div>
   )
 }
+
+

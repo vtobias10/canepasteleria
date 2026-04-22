@@ -1,4 +1,4 @@
-.stock-alert {
+﻿.stock-alert {
   display: flex;
   align-items: flex-start;
   gap: 12px;
@@ -91,7 +91,7 @@
 }
 
 .ingredient-check-custom::after {
-  content: '✓';
+  content: "\\2713";
   display: none;
   color: white;
   font-size: 0.8rem;
@@ -138,14 +138,21 @@
   border: 1.5px dashed rgba(139, 95, 173, 0.45);
   background: rgba(255, 255, 255, 0.78);
   color: var(--lilac-deep);
-  font-size: 1rem;
-  letter-spacing: -0.12em;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: grab;
   transition: all 0.16s ease;
   flex-shrink: 0;
+}
+
+.ingredient-drag-handle-icon {
+  width: 12px;
+  height: 18px;
+  border-radius: 999px;
+  background-image: radial-gradient(circle, currentColor 1.4px, transparent 1.5px);
+  background-size: 6px 6px;
+  background-position: 0 0;
 }
 
 .ingredient-drag-handle:hover {

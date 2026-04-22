@@ -5,16 +5,30 @@ import { AdminModal, ConfirmModal } from './AdminModal'
 import { getEmojiText, isEmojiImage, normalizeEmojiSrc } from '../../utils/emoji'
 import './ProductsManager.css'
 
-const EMOJI_OPTIONS = ['ðŸŽ‚', 'ðŸ§', 'ðŸ°', 'ðŸ«', 'ðŸª', 'ðŸŽ€', 'ðŸ©', 'ðŸ¥', 'ðŸ®', 'ðŸ¥§', '/emojis/bomba_de_crema.png', '/emojis/brownie.png']
+const EMOJI_OPTIONS = [
+  '\u{1F382}',
+  '\u{1F9C1}',
+  '\u{1F370}',
+  '\u{1F36B}',
+  '\u{1F36A}',
+  '\u{1F380}',
+  '\u{1F369}',
+  '\u{1F950}',
+  '\u{1F36E}',
+  '\u{1F967}',
+  '/emojis/bomba_de_crema.png',
+  '/emojis/brownie.png',
+]
 const VARIANT_SUGGESTIONS = ['Presentacion', 'Tamano', 'Sabor', 'Relleno', 'Cobertura', 'Formato']
 const MAX_IMAGE_FILE_SIZE = 2 * 1024 * 1024
+const DEFAULT_EMOJI = '\u{1F382}'
 
 const emptyProduct = {
   name: '',
   description: '',
   category: '',
   imageUrl: '',
-  emoji: 'ðŸŽ‚',
+  emoji: DEFAULT_EMOJI,
   variants: [],
   bolsitasXUd: [],
   price: null,
@@ -224,7 +238,7 @@ export default function ProductsManager() {
                     title={canDragReorder ? 'Arrastrar para reordenar' : 'Limpia la busqueda para reordenar'}
                     aria-label="Arrastrar para reordenar"
                   >
-                    â‹®â‹®
+                    <span className="drag-handle-icon" aria-hidden="true" />
                   </button>
                 </td>
                 <td>
@@ -318,10 +332,14 @@ function ProductFormModal({ initial, categories, onSave, onClose }) {
     variants: initial.variants ?? [],
     bolsitasXUd: initial.bolsitasXUd ?? [],
     imageUrl: initial.imageUrl ?? '',
+    emoji: initial.imageUrl ? (initial.emoji || '') : (initial.emoji || DEFAULT_EMOJI),
   }))
   const [newVariantName, setNewVariantName] = useState('')
   const [imageError, setImageError] = useState('')
+  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false)
+  const [mediaMode, setMediaMode] = useState(() => (initial.imageUrl ? 'image' : 'emoji'))
   const currentCategory = (form.category || '').trim()
+  const fileInputId = `product-image-input-${form.id || 'new'}`
   const categoryOptions = (() => {
     const base = categories || []
     if (!currentCategory) return base
@@ -354,6 +372,19 @@ function ProductFormModal({ initial, categories, onSave, onClose }) {
     set('variants', form.variants.filter((_, idx) => idx !== index))
   }
 
+  function switchToImageMode() {
+    setMediaMode('image')
+    set('emoji', '')
+    setImageError('')
+  }
+
+  function switchToEmojiMode() {
+    setMediaMode('emoji')
+    set('imageUrl', '')
+    if (!form.emoji) set('emoji', DEFAULT_EMOJI)
+    setImageError('')
+  }
+
   function handleImageSelected(event) {
     const file = event.target.files?.[0]
     event.target.value = ''
@@ -372,12 +403,33 @@ function ProductFormModal({ initial, categories, onSave, onClose }) {
     const reader = new FileReader()
     reader.onload = () => {
       set('imageUrl', String(reader.result || ''))
+      set('emoji', '')
+      setMediaMode('image')
       setImageError('')
     }
     reader.onerror = () => {
       setImageError('No se pudo leer la imagen.')
     }
     reader.readAsDataURL(file)
+  }
+
+  function openImagePicker() {
+    const node = typeof document !== 'undefined' ? document.getElementById(fileInputId) : null
+    node?.click()
+  }
+
+  function clearImage() {
+    set('imageUrl', '')
+    setMediaMode('emoji')
+    if (!form.emoji) set('emoji', DEFAULT_EMOJI)
+  }
+
+  function chooseEmoji(emoji) {
+    set('emoji', emoji)
+    set('imageUrl', '')
+    setMediaMode('emoji')
+    setImageError('')
+    setEmojiPickerOpen(false)
   }
 
   function handleSubmit(event) {
@@ -393,13 +445,15 @@ function ProductFormModal({ initial, categories, onSave, onClose }) {
     const sanitizedBolsitas = (form.bolsitasXUd || []).map(value => value.trim()).filter(Boolean)
     const regularPrice = toNumberOrNull(form.price)
     const salePrice = toNumberOrNull(form.salePrice)
+    const usingImage = mediaMode === 'image' && !!form.imageUrl
 
     onSave({
       ...form,
       name: form.name.trim(),
       description: form.description?.trim() || '',
       category: form.category?.trim() || '',
-      imageUrl: form.imageUrl || '',
+      imageUrl: usingImage ? form.imageUrl : '',
+      emoji: usingImage ? '' : (form.emoji || DEFAULT_EMOJI),
       variants: sanitizedVariants,
       bolsitasXUd: sanitizedBolsitas,
       price: regularPrice,
@@ -412,243 +466,286 @@ function ProductFormModal({ initial, categories, onSave, onClose }) {
   const formId = `product-form-${form.id || 'new'}`
 
   return (
-    <AdminModal
-      title={form.id ? 'Editar producto' : 'Nuevo producto'}
-      subtitle="Estructura flexible para cualquier formato de venta."
-      size="wide"
-      onClose={onClose}
-      actions={(
-        <>
-          <button type="button" className="btn btn-ghost" onClick={onClose}>Cancelar</button>
-          <button type="submit" form={formId} className="btn btn-primary">
-            {form.id ? 'Guardar cambios' : 'Crear producto'}
-          </button>
-        </>
-      )}
-    >
-      <form id={formId} onSubmit={handleSubmit} className="product-modal-form">
-        <div className="product-modal-layout">
-          <div className="product-modal-left">
-            <section className="admin-modal-section">
-              <div className="admin-modal-section-title">Ficha del producto</div>
+    <>
+      <AdminModal
+        title={form.id ? 'Editar producto' : 'Nuevo producto'}
+        subtitle="Estructura flexible para cualquier formato de venta."
+        size="xwide"
+        onClose={onClose}
+        actions={(
+          <>
+            <button type="button" className="btn btn-ghost" onClick={onClose}>Cancelar</button>
+            <button type="submit" form={formId} className="btn btn-primary">
+              {form.id ? 'Guardar cambios' : 'Crear producto'}
+            </button>
+          </>
+        )}
+      >
+        <form id={formId} onSubmit={handleSubmit} className="product-modal-form">
+          <div className="product-modal-layout">
+            <div className="product-modal-left-col">
+              <section className="admin-modal-section">
+                <div className="admin-modal-section-title">Ficha del producto</div>
 
-              <div className="admin-modal-grid-2">
-                <div className="form-group">
-                  <label>Nombre *</label>
-                  <input
-                    required
-                    value={form.name}
-                    onChange={event => set('name', event.target.value)}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Categoria</label>
-                  <select
-                    value={form.category || ''}
-                    onChange={event => set('category', event.target.value)}
-                  >
-                    <option value="">Sin categoria</option>
-                    {categoryOptions.map(category => (
-                      <option key={category.id} value={category.name}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Imagen del producto</label>
-                <div className="product-image-upload-row">
-                  <div className="product-image-preview">
-                    {form.imageUrl ? (
-                      <img src={form.imageUrl} alt="Vista previa del producto" className="product-image-preview-img" />
-                    ) : (
-                      <span className="product-image-preview-placeholder">Sin imagen</span>
-                    )}
-                  </div>
-                  <div className="product-image-upload-actions">
-                    <label className="btn btn-ghost btn-sm product-image-upload-btn">
-                      Subir imagen
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageSelected}
-                        style={{ display: 'none' }}
-                      />
-                    </label>
-                    {form.imageUrl && (
-                      <button
-                        type="button"
-                        className="btn btn-danger btn-sm"
-                        onClick={() => set('imageUrl', '')}
-                      >
-                        Quitar imagen
-                      </button>
-                    )}
-                  </div>
-                </div>
-                {imageError && <span className="admin-modal-help" style={{ color: '#b44747' }}>{imageError}</span>}
-              </div>
-
-              <div className="product-meta-grid">
-                <div className="form-group">
-                  <label>Cantidad minima</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={form.minQuantity || 1}
-                    onChange={event => set('minQuantity', event.target.value)}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Estado</label>
-                  <label className="admin-checkbox-row">
+                <div className="admin-modal-grid-2">
+                  <div className="form-group">
+                    <label>Nombre *</label>
                     <input
-                      type="checkbox"
-                      checked={!!form.active}
-                      onChange={event => set('active', event.target.checked)}
+                      required
+                      value={form.name}
+                      onChange={event => set('name', event.target.value)}
                     />
-                    Visible en la carta
-                  </label>
+                  </div>
+                  <div className="form-group">
+                    <label>Categoria</label>
+                    <select
+                      value={form.category || ''}
+                      onChange={event => set('category', event.target.value)}
+                    >
+                      <option value="">Sin categoria</option>
+                      {categoryOptions.map(category => (
+                        <option key={category.id} value={category.name}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 <div className="form-group">
-                  <label>Emoji</label>
-                  <div className="emoji-grid">
-                    {EMOJI_OPTIONS.map(emoji => (
-                      <button
-                        key={emoji}
-                        type="button"
-                        className={`emoji-btn ${form.emoji === emoji ? 'selected' : ''}`}
-                        onClick={() => set('emoji', emoji)}
-                      >
-                        {isEmojiImage(emoji) ? (
+                  <label>Imagen / Icono</label>
+                  <div className="product-media-mode-switch">
+                    <button
+                      type="button"
+                      className={`btn btn-sm ${mediaMode === 'image' ? 'btn-primary' : 'btn-ghost'}`}
+                      onClick={switchToImageMode}
+                    >
+                      Imagen
+                    </button>
+                    <button
+                      type="button"
+                      className={`btn btn-sm ${mediaMode === 'emoji' ? 'btn-primary' : 'btn-ghost'}`}
+                      onClick={switchToEmojiMode}
+                    >
+                      Icono
+                    </button>
+                  </div>
+
+                  <div className="product-media-editor-row">
+                    {mediaMode === 'image' ? (
+                      <div className={`product-image-editor ${form.imageUrl ? 'has-image' : ''}`}>
+                        {form.imageUrl ? (
+                          <img src={form.imageUrl} alt="Vista previa del producto" className="product-image-editor-img" />
+                        ) : (
+                          <span className="product-image-editor-placeholder">Sin imagen</span>
+                        )}
+                        <input
+                          id={fileInputId}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageSelected}
+                          style={{ display: 'none' }}
+                        />
+                        <button
+                          type="button"
+                          className="product-image-editor-action edit"
+                          aria-label="Editar imagen"
+                          onClick={openImagePicker}
+                        >
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                            <path d="M12 20h9" />
+                            <path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+                          </svg>
+                        </button>
+                        {form.imageUrl && (
+                          <button
+                            type="button"
+                            className="product-image-editor-action remove"
+                            aria-label="Quitar imagen"
+                            onClick={clearImage}
+                          >
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                              <path d="M3 6h18" />
+                              <path d="M8 6V4h8v2" />
+                              <path d="M19 6l-1 14H6L5 6" />
+                              <path d="M10 11v6M14 11v6" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <button type="button" className="product-emoji-picker-trigger" onClick={() => setEmojiPickerOpen(true)}>
+                        {isEmojiImage(form.emoji) ? (
                           <img
-                            src={normalizeEmojiSrc(emoji)}
-                            alt="Emoji personalizado"
-                            className="emoji-btn-image"
+                            src={normalizeEmojiSrc(form.emoji)}
+                            alt="Icono seleccionado"
+                            className="product-emoji-picker-preview-img"
                           />
                         ) : (
-                          emoji
+                          <span className="product-emoji-picker-preview-text">{getEmojiText(form.emoji, DEFAULT_EMOJI)}</span>
                         )}
+                        <span>Elegir icono</span>
                       </button>
-                    ))}
+                    )}
                   </div>
+                  {imageError && <span className="admin-modal-help" style={{ color: '#b44747' }}>{imageError}</span>}
                 </div>
-              </div>
 
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label>Descripcion</label>
-                <textarea
-                  className="product-description-input"
-                  value={form.description}
-                  onChange={event => set('description', event.target.value)}
-                />
-              </div>
-            </section>
-
-            <section className="admin-modal-section">
-              <div className="admin-modal-section-title">Venta y comunicacion</div>
-
-              <div className="admin-modal-grid-2 product-sales-grid">
-                <div className="form-group">
-                  <label>Precio</label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="1"
-                    value={form.price ?? ''}
-                    onChange={event => set('price', event.target.value)}
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label>Descripcion</label>
+                  <textarea
+                    className="product-description-input"
+                    value={form.description}
+                    onChange={event => set('description', event.target.value)}
                   />
                 </div>
-                <div className="form-group">
-                  <label>Precio con rebaja</label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="1"
-                    value={form.salePrice ?? ''}
-                    onChange={event => set('salePrice', event.target.value)}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Opciones unitarias / packs (opcional)</label>
-                  <ChipInput
-                    chips={form.bolsitasXUd || []}
-                    onChange={values => set('bolsitasXUd', values)}
-                  />
-                  <span className="admin-modal-help">
-                    Util para productos que se venden por unidad con packs definidos.
-                  </span>
-                </div>
-                <div className="form-group">
-                  <label>Nota comercial visible</label>
-                  <input
-                    value={form.priceNote || ''}
-                    onChange={event => set('priceNote', event.target.value)}
-                  />
-                  <span className="admin-modal-help">
-                    Se muestra en la carta y en el mensaje prearmado de WhatsApp.
-                  </span>
-                </div>
-              </div>
-            </section>
-          </div>
+              </section>
 
-          <section className="admin-modal-section product-modal-right">
-            <div className="admin-modal-section-title">Formato de venta y opciones</div>
+              <section className="admin-modal-section">
+                <div className="admin-modal-section-title">Venta y comunicacion</div>
 
-            <div className="product-variant-suggestions">
-              {VARIANT_SUGGESTIONS.map(name => (
-                <button
-                  key={name}
-                  type="button"
-                  className="btn btn-ghost btn-sm"
-                  onClick={() => addVariantByName(name)}
-                >
-                  + {name}
-                </button>
-              ))}
-            </div>
-
-            <div className="add-variant-row">
-              <input
-                value={newVariantName}
-                onChange={event => setNewVariantName(event.target.value)}
-                onKeyDown={event => event.key === 'Enter' && (event.preventDefault(), addVariantByName(newVariantName))}
-              />
-              <button type="button" className="btn btn-primary btn-sm" onClick={() => addVariantByName(newVariantName)}>
-                Agregar bloque
-              </button>
-            </div>
-
-            {form.variants.length > 0 && (
-              <div className="product-variant-grid">
-                {form.variants.map((variant, index) => (
-                  <div key={`${variant.name}-${index}`} className="product-variant-card">
-                    <div className="product-variant-head">
-                      <input
-                        value={variant.name}
-                        onChange={event => updateVariantName(index, event.target.value)}
-                      />
-                      <button type="button" className="btn btn-danger btn-sm" onClick={() => removeVariant(index)}>
-                        Quitar
-                      </button>
-                    </div>
-                    <ChipInput
-                      chips={variant.options || []}
-                      onChange={options => updateVariantOptions(index, options)}
+                <div className="admin-modal-grid-2 product-sales-grid">
+                  <div className="form-group">
+                    <label>Cantidad minima</label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={form.minQuantity || 1}
+                      onChange={event => set('minQuantity', event.target.value)}
                     />
                   </div>
+                  <div className="form-group">
+                    <label>Packs</label>
+                    <ChipInput
+                      chips={form.bolsitasXUd || []}
+                      onChange={values => set('bolsitasXUd', values)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Precio</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={form.price ?? ''}
+                      onChange={event => set('price', event.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Precio con rebaja</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={form.salePrice ?? ''}
+                      onChange={event => set('salePrice', event.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Nota comercial</label>
+                    <input
+                      value={form.priceNote || ''}
+                      onChange={event => set('priceNote', event.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Estado</label>
+                    <label className="product-status-field">
+                      <input
+                        type="checkbox"
+                        checked={!!form.active}
+                        onChange={event => set('active', event.target.checked)}
+                      />
+                      <span>Activo</span>
+                    </label>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <section className="admin-modal-section product-modal-right">
+              <div className="admin-modal-section-title">Formato de venta y opciones</div>
+
+              <div className="product-variant-suggestions">
+                {VARIANT_SUGGESTIONS.map(name => (
+                  <button
+                    key={name}
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => addVariantByName(name)}
+                  >
+                    + {name}
+                  </button>
                 ))}
               </div>
-            )}
-          </section>
-        </div>
-      </form>
-    </AdminModal>
+
+              <div className="add-variant-row">
+                <input
+                  value={newVariantName}
+                  onChange={event => setNewVariantName(event.target.value)}
+                  onKeyDown={event => event.key === 'Enter' && (event.preventDefault(), addVariantByName(newVariantName))}
+                />
+                <button type="button" className="btn btn-primary btn-sm" onClick={() => addVariantByName(newVariantName)}>
+                  Agregar bloque
+                </button>
+              </div>
+
+              {form.variants.length > 0 && (
+                <div className="product-variant-grid">
+                  {form.variants.map((variant, index) => (
+                    <div key={`${variant.name}-${index}`} className="product-variant-card">
+                      <div className="product-variant-head">
+                        <input
+                          value={variant.name}
+                          onChange={event => updateVariantName(index, event.target.value)}
+                        />
+                        <button type="button" className="btn btn-danger btn-sm" onClick={() => removeVariant(index)}>
+                          Quitar
+                        </button>
+                      </div>
+                      <ChipInput
+                        chips={variant.options || []}
+                        onChange={options => updateVariantOptions(index, options)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          </div>
+        </form>
+      </AdminModal>
+
+      {emojiPickerOpen && (
+        <AdminModal
+          title="Elegir icono"
+          subtitle="Selecciona un icono para el producto."
+          size="compact"
+          onClose={() => setEmojiPickerOpen(false)}
+        >
+          <div className="product-emoji-picker-grid">
+            {EMOJI_OPTIONS.map(emoji => (
+              <button
+                key={emoji}
+                type="button"
+                className={`emoji-btn ${form.emoji === emoji ? 'selected' : ''}`}
+                onClick={() => chooseEmoji(emoji)}
+              >
+                {isEmojiImage(emoji) ? (
+                  <img
+                    src={normalizeEmojiSrc(emoji)}
+                    alt="Icono personalizado"
+                    className="emoji-btn-image"
+                  />
+                ) : (
+                  emoji
+                )}
+              </button>
+            ))}
+          </div>
+        </AdminModal>
+      )}
+    </>
   )
 }
 
