@@ -1,7 +1,8 @@
-/* Full-screen centered layout, carrd.co style — no page scroll */
+/* Full-screen centered layout — scrolleable si el contenido no entra */
 .home-outer {
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100svh;
+  min-height: 100vh;
+  overflow-y: auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -182,6 +183,20 @@
 }
 
 @media (max-width: 520px) {
-  .home-card { padding: 36px 24px 28px; border-radius: 20px; }
-  .home-logo { width: 90px; height: 90px; }
+  .home-outer { padding: 16px; }
+  .home-card { padding: 28px 20px 22px; border-radius: 20px; }
+  .home-logo { width: 82px; height: 82px; }
+  .home-logo-wrap { margin-bottom: 14px; }
+  .home-tagline { font-size: 1.05rem; margin-bottom: 14px; }
+  .home-divider { margin-bottom: 12px; }
+  .home-description { font-size: 0.85rem; margin-bottom: 20px; }
+  .home-actions { margin-bottom: 16px; }
+}
+
+@media (max-width: 380px) {
+  .home-card { padding: 22px 16px 18px; }
+  .home-logo { width: 72px; height: 72px; }
+  .home-tagline { font-size: 0.97rem; }
+  .home-description { font-size: 0.82rem; line-height: 1.55; }
+  .home-btn { font-size: 0.8rem; padding: 8px 16px; }
 }
