@@ -333,7 +333,7 @@ function OrderFormModal({ initial, onSave, onClose }) {
     <AdminModal
       title={form.id ? 'Editar pedido' : 'Nuevo pedido'}
       subtitle="Diseño unificado con bloques compactos para cargar toda la información de un vistazo."
-      size="xwide"
+      size="wide"
       onClose={onClose}
       actions={(
         <>

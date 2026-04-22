@@ -27,7 +27,9 @@ function PriceBlock({ product }) {
   const hasPrice = regularPrice !== null
   const hasSale = discountedPrice !== null && discountedPrice > 0
 
-  if (!hasPrice && !hasSale) return null
+  if (!hasPrice && !hasSale) {
+    return <div className="price-main-row"><span className="price-now">CONSULTAR PRECIO</span></div>
+  }
 
   if (hasPrice && hasSale && discountedPrice < regularPrice) {
     return (
@@ -67,7 +69,13 @@ export default function ProductModal({ product, whatsappNumber, messageTexts, on
       <div className="modal product-modal">
         <div className="modal-header">
           <div className="modal-title-group">
-            {isEmojiImage(product.emoji) ? (
+            {product.imageUrl ? (
+              <img
+                src={product.imageUrl}
+                alt={`Imagen de ${product.name}`}
+                className="modal-product-image"
+              />
+            ) : isEmojiImage(product.emoji) ? (
               <img
                 src={normalizeEmojiSrc(product.emoji)}
                 alt={`Emoji de ${product.name}`}

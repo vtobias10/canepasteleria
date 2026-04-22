@@ -10,10 +10,10 @@ export function AdminModal({
   children,
 }) {
   const sizeStyles = {
-    compact: { width: 'min(92vw, 460px)', maxWidth: 'none' },
-    medium: { width: 'min(92vw, 760px)', maxWidth: 'none' },
-    wide: { width: 'min(95vw, 1180px)', maxWidth: 'none' },
-    xwide: { width: 'min(96vw, 1460px)', maxWidth: 'none' },
+    compact: { width: 'min(92vw, 440px)', maxWidth: 'none' },
+    medium: { width: 'min(92vw, 700px)', maxWidth: 'none' },
+    wide: { width: 'min(94vw, 1080px)', maxWidth: 'none' },
+    xwide: { width: 'min(95vw, 1220px)', maxWidth: 'none' },
   }
 
   function handleOverlayClick(event) {

@@ -37,6 +37,7 @@ const toProduct = (row) => ({
   bolsitasXUd: row.bolsitas_x_ud ?? [],
   price: toNumberOrNull(row.price),
   salePrice: normalizeSalePrice(row.sale_price),
+  imageUrl: row.image_url ?? '',
   priceNote: row.price_note ?? '',
   minQuantity: row.min_quantity ?? 1,
   active: row.active ?? true,
@@ -53,6 +54,7 @@ const fromProduct = (product) => ({
   bolsitas_x_ud: product.bolsitasXUd ?? [],
   price: toNumberOrNull(product.price),
   sale_price: normalizeSalePrice(product.salePrice),
+  image_url: product.imageUrl ?? '',
   price_note: product.priceNote ?? '',
   min_quantity: product.minQuantity ?? 1,
   active: product.active ?? true,
@@ -60,45 +62,23 @@ const fromProduct = (product) => ({
 })
 
 const stripOptionalProductFields = (payload) => {
-  const { price, sale_price, sort_order, ...rest } = payload
+  const { price, sale_price, sort_order, image_url, ...rest } = payload
   return rest
 }
 
 function stripMissingProductFields(payload, errorMessage = '') {
   const message = String(errorMessage || '').toLowerCase()
-
   if (!message) return stripOptionalProductFields(payload)
 
-  const missingPrice = message.includes('price') && !message.includes('sale_price')
-  const missingSalePrice = message.includes('sale_price')
-  const missingSortOrder = message.includes('sort_order')
+  const optionalColumns = ['price', 'sale_price', 'sort_order', 'image_url']
+  const missingColumns = optionalColumns.filter(column => message.includes(column))
+  if (missingColumns.length === 0) return stripOptionalProductFields(payload)
 
-  if (missingPrice && missingSalePrice && missingSortOrder) {
-    const { price, sale_price, sort_order, ...rest } = payload
-    return rest
-  }
-
-  if (missingPrice && missingSalePrice) {
-    const { price, sale_price, ...rest } = payload
-    return rest
-  }
-
-  if (missingSalePrice) {
-    const { sale_price, ...rest } = payload
-    return rest
-  }
-
-  if (missingPrice) {
-    const { price, ...rest } = payload
-    return rest
-  }
-
-  if (missingSortOrder) {
-    const { sort_order, ...rest } = payload
-    return rest
-  }
-
-  return stripOptionalProductFields(payload)
+  const next = { ...payload }
+  missingColumns.forEach((column) => {
+    delete next[column]
+  })
+  return next
 }
 
 const toIngredient = (row) => ({

@@ -1,18 +1,20 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { useData } from '../../context/DataContext'
 import ChipInput from './ChipInput'
 import { AdminModal, ConfirmModal } from './AdminModal'
 import { getEmojiText, isEmojiImage, normalizeEmojiSrc } from '../../utils/emoji'
 import './ProductsManager.css'
 
-const EMOJI_OPTIONS = ['🎂', '🧁', '🍰', '🍫', '🍪', '🎀', '🍩', '🥐', '🍮', '🥧', '/emojis/bomba_de_crema.png', '/emojis/brownie.png']
+const EMOJI_OPTIONS = ['ðŸŽ‚', 'ðŸ§', 'ðŸ°', 'ðŸ«', 'ðŸª', 'ðŸŽ€', 'ðŸ©', 'ðŸ¥', 'ðŸ®', 'ðŸ¥§', '/emojis/bomba_de_crema.png', '/emojis/brownie.png']
 const VARIANT_SUGGESTIONS = ['Presentacion', 'Tamano', 'Sabor', 'Relleno', 'Cobertura', 'Formato']
+const MAX_IMAGE_FILE_SIZE = 2 * 1024 * 1024
 
 const emptyProduct = {
   name: '',
   description: '',
   category: '',
-  emoji: '🎂',
+  imageUrl: '',
+  emoji: 'ðŸŽ‚',
   variants: [],
   bolsitasXUd: [],
   price: null,
@@ -222,12 +224,18 @@ export default function ProductsManager() {
                     title={canDragReorder ? 'Arrastrar para reordenar' : 'Limpia la busqueda para reordenar'}
                     aria-label="Arrastrar para reordenar"
                   >
-                    ⋮⋮
+                    â‹®â‹®
                   </button>
                 </td>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    {isEmojiImage(product.emoji) ? (
+                    {product.imageUrl ? (
+                      <img
+                        src={product.imageUrl}
+                        alt={`Imagen de ${product.name}`}
+                        className="admin-product-image-thumb"
+                      />
+                    ) : isEmojiImage(product.emoji) ? (
                       <img
                         src={normalizeEmojiSrc(product.emoji)}
                         alt={`Emoji de ${product.name}`}
@@ -309,8 +317,10 @@ function ProductFormModal({ initial, categories, onSave, onClose }) {
     ...initial,
     variants: initial.variants ?? [],
     bolsitasXUd: initial.bolsitasXUd ?? [],
+    imageUrl: initial.imageUrl ?? '',
   }))
   const [newVariantName, setNewVariantName] = useState('')
+  const [imageError, setImageError] = useState('')
   const currentCategory = (form.category || '').trim()
   const categoryOptions = (() => {
     const base = categories || []
@@ -344,6 +354,32 @@ function ProductFormModal({ initial, categories, onSave, onClose }) {
     set('variants', form.variants.filter((_, idx) => idx !== index))
   }
 
+  function handleImageSelected(event) {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      setImageError('El archivo debe ser una imagen valida.')
+      return
+    }
+
+    if (file.size > MAX_IMAGE_FILE_SIZE) {
+      setImageError('La imagen supera 2MB. Usa una mas liviana.')
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      set('imageUrl', String(reader.result || ''))
+      setImageError('')
+    }
+    reader.onerror = () => {
+      setImageError('No se pudo leer la imagen.')
+    }
+    reader.readAsDataURL(file)
+  }
+
   function handleSubmit(event) {
     event.preventDefault()
 
@@ -363,6 +399,7 @@ function ProductFormModal({ initial, categories, onSave, onClose }) {
       name: form.name.trim(),
       description: form.description?.trim() || '',
       category: form.category?.trim() || '',
+      imageUrl: form.imageUrl || '',
       variants: sanitizedVariants,
       bolsitasXUd: sanitizedBolsitas,
       price: regularPrice,
@@ -378,7 +415,7 @@ function ProductFormModal({ initial, categories, onSave, onClose }) {
     <AdminModal
       title={form.id ? 'Editar producto' : 'Nuevo producto'}
       subtitle="Estructura flexible para cualquier formato de venta."
-      size="xwide"
+      size="wide"
       onClose={onClose}
       actions={(
         <>
@@ -418,6 +455,40 @@ function ProductFormModal({ initial, categories, onSave, onClose }) {
                     ))}
                   </select>
                 </div>
+              </div>
+
+              <div className="form-group">
+                <label>Imagen del producto</label>
+                <div className="product-image-upload-row">
+                  <div className="product-image-preview">
+                    {form.imageUrl ? (
+                      <img src={form.imageUrl} alt="Vista previa del producto" className="product-image-preview-img" />
+                    ) : (
+                      <span className="product-image-preview-placeholder">Sin imagen</span>
+                    )}
+                  </div>
+                  <div className="product-image-upload-actions">
+                    <label className="btn btn-ghost btn-sm product-image-upload-btn">
+                      Subir imagen
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageSelected}
+                        style={{ display: 'none' }}
+                      />
+                    </label>
+                    {form.imageUrl && (
+                      <button
+                        type="button"
+                        className="btn btn-danger btn-sm"
+                        onClick={() => set('imageUrl', '')}
+                      >
+                        Quitar imagen
+                      </button>
+                    )}
+                  </div>
+                </div>
+                {imageError && <span className="admin-modal-help" style={{ color: '#b44747' }}>{imageError}</span>}
               </div>
 
               <div className="product-meta-grid">
@@ -580,3 +651,4 @@ function ProductFormModal({ initial, categories, onSave, onClose }) {
     </AdminModal>
   )
 }
+

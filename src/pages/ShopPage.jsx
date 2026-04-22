@@ -1,11 +1,11 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useData } from '../context/DataContext'
 import ProductModal from '../components/public/ProductModal'
 import { getEmojiText, isEmojiImage, normalizeEmojiSrc } from '../utils/emoji'
 import './ShopPage.css'
 
-const PRODUCTS_PER_PAGE = 9
+const PRODUCTS_PER_PAGE = 6
 const CARD_SPARKLES = [
   { left: '12%', top: '18%', delay: '0s', duration: '2.8s', size: '4px' },
   { left: '26%', top: '72%', delay: '0.45s', duration: '3.2s', size: '5px' },
@@ -56,7 +56,11 @@ function ProductPrice({ product }) {
     )
   }
 
-  return <span className="product-price-line"><span className="product-price-sale">{formatMoney(hasSale ? discountedPrice : regularPrice)}</span></span>
+  return (
+    <span className="product-price-line">
+      <span className="product-price-sale">{formatMoney(hasSale ? discountedPrice : regularPrice)}</span>
+    </span>
+  )
 }
 
 export default function ShopPage() {
@@ -84,7 +88,7 @@ export default function ShopPage() {
     <div className="shop-outer">
       <div className="shop-topbar">
         <Link to="/" className="shop-back-btn">
-          ← Inicio
+          {'\u2190'} Inicio
         </Link>
         <img src={config.logoUrl || '/logo.jpeg'} alt="Cane" className="shop-logo-mini" />
       </div>
@@ -137,22 +141,34 @@ export default function ShopPage() {
                   />
                 ))}
               </div>
+
               <div className="product-card-inner">
-                <div className="product-emoji-circle">
-                  {isEmojiImage(product.emoji) ? (
-                    <img
-                      src={normalizeEmojiSrc(product.emoji)}
-                      alt={`Emoji de ${product.name}`}
-                      className="product-emoji-image"
-                    />
-                  ) : (
-                    <span className="product-emoji">{getEmojiText(product.emoji)}</span>
-                  )}
+                <div className="product-media-col">
+                  <div className={`product-media-frame ${product.imageUrl ? 'has-image' : ''}`}>
+                    {product.imageUrl ? (
+                      <img
+                        src={product.imageUrl}
+                        alt={`Imagen de ${product.name}`}
+                        className="product-main-image"
+                      />
+                    ) : isEmojiImage(product.emoji) ? (
+                      <img
+                        src={normalizeEmojiSrc(product.emoji)}
+                        alt={`Emoji de ${product.name}`}
+                        className="product-emoji-image"
+                      />
+                    ) : (
+                      <span className="product-emoji">{getEmojiText(product.emoji)}</span>
+                    )}
+                  </div>
                 </div>
-                <h3 className="product-name">{product.name}</h3>
-                {product.category && <span className="product-category-min">{product.category}</span>}
-                <ProductPrice product={product} />
-                <span className="product-open-detail">Ver detalle <span aria-hidden="true">→</span></span>
+
+                <div className="product-info-col">
+                  <h3 className="product-name">{product.name}</h3>
+                  {product.category && <span className="product-category-min">{product.category}</span>}
+                  <ProductPrice product={product} />
+                  <span className="product-open-detail">Ver detalle <span aria-hidden="true">{'\u2192'}</span></span>
+                </div>
               </div>
             </button>
           ))}
@@ -172,7 +188,7 @@ export default function ShopPage() {
               onClick={() => setPage(prev => Math.max(0, prev - 1))}
               disabled={page === 0}
             >
-              ← Ant
+              {'\u2190'} Ant
             </button>
             <div className="page-dots">
               {Array.from({ length: totalPages }, (_, idx) => (
@@ -188,7 +204,7 @@ export default function ShopPage() {
               onClick={() => setPage(prev => Math.min(totalPages - 1, prev + 1))}
               disabled={page === totalPages - 1}
             >
-              Sig →
+              Sig {'\u2192'}
             </button>
           </div>
         )}
