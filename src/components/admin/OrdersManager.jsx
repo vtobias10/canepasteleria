@@ -118,14 +118,18 @@ export default function OrdersManager() {
   const searchClean = search.trim().replace(/^#/, '')
   const filtered = searchClean
     ? byStatus.filter(order => {
-      const numPadded = order.orderNumber ? String(order.orderNumber).padStart(4, '0') : ''
-      const numRaw = order.orderNumber ? String(order.orderNumber) : ''
+      const n = order.orderNumber
+      const numVariants = n ? [
+        String(n),
+        String(n).padStart(2, '0'),
+        String(n).padStart(3, '0'),
+        String(n).padStart(4, '0'),
+      ] : []
       return (
         order.customerName?.toLowerCase().includes(searchClean.toLowerCase()) ||
         order.phone?.includes(searchClean) ||
         order.tags?.some(tag => tag.toLowerCase().includes(searchClean.toLowerCase())) ||
-        numRaw.includes(searchClean) ||
-        numPadded.includes(searchClean)
+        numVariants.some(v => v.includes(searchClean))
       )
     })
     : byStatus

@@ -412,12 +412,13 @@ button:disabled,
   font-size: 0.6rem;
   color: rgba(139, 95, 173, 0.45);
   letter-spacing: 0.05em;
-  padding-top: 2px;
+  padding-top: 10px;
+  margin-top: 6px;
+  border-top: 1px dashed rgba(139, 95, 173, 0.2);
 }
 
 .hachitec-watermark strong {
   font-weight: 800;
   font-family: 'Lato', sans-serif;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }

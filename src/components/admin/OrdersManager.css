@@ -18,6 +18,12 @@
   align-items: center;
   gap: 12px;
   padding: 10px 14px;
+  overflow: visible !important;
+}
+
+.order-row-actions {
+  position: relative;
+  z-index: 10;
 }
 
 .order-row-avatar {

@@ -64,7 +64,7 @@ export default function HomePage() {
         </div>
 
         <div className="hachitec-watermark">
-          ✦ Desarrollado por <strong>Hachitec</strong>
+          ✦ Desarrollado por <strong>hachitec</strong>
         </div>
       </div>
 
