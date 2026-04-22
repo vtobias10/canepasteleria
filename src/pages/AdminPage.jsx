@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, NavLink, useNavigate } from 'react-router-dom'
 import { useData } from '../context/DataContext'
 import AdminLogin from '../components/admin/AdminLogin'
 import ProductsManager from '../components/admin/ProductsManager'
+import CategoriesManager from '../components/admin/CategoriesManager'
 import IngredientsManager from '../components/admin/IngredientsManager'
 import OrdersManager from '../components/admin/OrdersManager'
 import ConfigManager from '../components/admin/ConfigManager'
@@ -49,6 +50,9 @@ export default function AdminPage() {
           <NavLink to="/canepasteleria-admin/productos" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}>
             <span>🎂</span> Productos
           </NavLink>
+          <NavLink to="/canepasteleria-admin/categorias" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}>
+            <span>🏷️</span> Categorias
+          </NavLink>
           <NavLink to="/canepasteleria-admin/ingredientes" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}>
             <span>🥚</span> Ingredientes
           </NavLink>
@@ -75,6 +79,7 @@ export default function AdminPage() {
           <Routes>
             <Route index element={<Navigate to="productos" />} />
             <Route path="productos" element={<ProductsManager />} />
+            <Route path="categorias" element={<CategoriesManager />} />
             <Route path="ingredientes" element={<IngredientsManager />} />
             <Route path="pedidos" element={<OrdersManager />} />
             <Route path="configuracion" element={<ConfigManager />} />

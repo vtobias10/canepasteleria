@@ -14,11 +14,43 @@
   flex-shrink: 0;
 }
 
+.modal-emoji-image {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
 .modal-desc {
   font-size: 0.95rem;
   color: var(--text-mid);
   line-height: 1.6;
-  margin-bottom: 24px;
+  margin-bottom: 18px;
+}
+
+.price-main-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.price-old {
+  font-size: 0.88rem;
+  color: var(--text-light);
+  text-decoration: line-through;
+}
+
+.price-sale {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #b44747;
+}
+
+.price-now {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-dark);
 }
 
 /* ─── Variant options ─────────────────── */
@@ -117,7 +149,7 @@
   font-size: 0.88rem;
   color: var(--text-dark);
   font-weight: 600;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .price-note-icon {

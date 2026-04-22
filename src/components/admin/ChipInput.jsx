@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export default function ChipInput({ chips, onChange, placeholder = 'Agregar y presionar Enter' }) {
+export default function ChipInput({ chips, onChange, placeholder = 'Agregar + Enter' }) {
   const [input, setInput] = useState('')
 
   function handleKey(e) {

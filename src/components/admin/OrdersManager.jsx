@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useData } from '../../context/DataContext'
 import ChipInput from './ChipInput'
 import { AdminModal, ConfirmModal } from './AdminModal'
+import { getEmojiText } from '../../utils/emoji'
 import './OrdersManager.css'
 
 const STATUS_OPTIONS = ['Pendiente', 'En preparación', 'Listo', 'Entregado', 'Cancelado']
@@ -354,7 +355,6 @@ function OrderFormModal({ initial, onSave, onClose }) {
                   <input
                     value={form.customerName}
                     onChange={event => set('customerName', event.target.value)}
-                    placeholder="Ej: María García"
                   />
                 </div>
                 <div className="form-group">
@@ -362,7 +362,6 @@ function OrderFormModal({ initial, onSave, onClose }) {
                   <input
                     value={form.phone}
                     onChange={event => set('phone', event.target.value)}
-                    placeholder="Ej: 5491112345678"
                   />
                 </div>
               </div>
@@ -371,7 +370,6 @@ function OrderFormModal({ initial, onSave, onClose }) {
                 <input
                   value={form.address}
                   onChange={event => set('address', event.target.value)}
-                  placeholder="Ej: Av. Corrientes 1234, CABA"
                 />
               </div>
             </section>
@@ -488,7 +486,7 @@ function OrderFormModal({ initial, onSave, onClose }) {
                 <ChipInput
                   chips={form.tags || []}
                   onChange={tags => set('tags', tags)}
-                  placeholder="Urgente, adelanto pagado..."
+                  placeholder="Agregar + Enter"
                 />
               </div>
 
@@ -497,7 +495,6 @@ function OrderFormModal({ initial, onSave, onClose }) {
                 <textarea
                   value={form.notes}
                   onChange={event => set('notes', event.target.value)}
-                  placeholder="Sin maní, dedicatoria especial..."
                 />
               </div>
             </section>
@@ -525,7 +522,7 @@ function OrderItemRow({ item, products, onProductSelect, onUpdate, onRemove, can
             <option value="">- Seleccionar -</option>
             {products.filter(product => product.active).map(product => (
               <option key={product.id} value={product.id}>
-                {product.emoji} {product.name}
+                {getEmojiText(product.emoji)} {product.name}
               </option>
             ))}
             <option value="__custom__">✏️ Personalizado</option>
@@ -556,7 +553,6 @@ function OrderItemRow({ item, products, onProductSelect, onUpdate, onRemove, can
             <input
               value={item.customName}
               onChange={event => onUpdate({ customName: event.target.value })}
-              placeholder="Ej: Torta especial sin maní"
             />
           </div>
           <div className="form-group" style={{ marginBottom: 0 }}>
@@ -564,7 +560,6 @@ function OrderItemRow({ item, products, onProductSelect, onUpdate, onRemove, can
             <input
               value={item.customDetails}
               onChange={event => onUpdate({ customDetails: event.target.value })}
-              placeholder="Ej: Decoración floral, 8 porciones"
             />
           </div>
         </div>
@@ -608,3 +603,5 @@ function OrderItemRow({ item, products, onProductSelect, onUpdate, onRemove, can
     </div>
   )
 }
+
+
