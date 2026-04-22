@@ -420,6 +420,24 @@
   border-color: transparent !important;
 }
 
+@media (max-height: 820px) {
+  .product-variant-grid {
+    max-height: min(22vh, 200px);
+  }
+
+  .product-description-input {
+    min-height: 80px;
+  }
+
+  .product-modal-layout {
+    gap: 7px;
+  }
+
+  .product-modal-top-row {
+    gap: 7px;
+  }
+}
+
 @media (max-width: 860px) {
   .product-modal-top-row {
     grid-template-columns: 1fr;

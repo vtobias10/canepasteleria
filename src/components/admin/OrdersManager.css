@@ -494,6 +494,41 @@
   border-top: 1px dashed var(--lilac-mid);
 }
 
+@media (max-height: 820px) {
+  .order-form-layout {
+    gap: 8px;
+  }
+
+  .order-column {
+    gap: 8px;
+  }
+
+  .order-products-section .order-items-table {
+    max-height: clamp(160px, 36vh, 320px);
+  }
+
+  .order-view-grid {
+    gap: 8px;
+  }
+
+  .order-form-top {
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .order-filters {
+    margin-bottom: 12px;
+  }
+
+  .orders-list {
+    gap: 6px;
+  }
+
+  .order-row {
+    padding: 7px 12px;
+  }
+}
+
 @media (max-width: 1000px) {
   .order-form-top {
     grid-template-columns: repeat(2, minmax(0, 1fr));
