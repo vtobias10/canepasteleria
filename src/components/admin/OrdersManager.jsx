@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useData } from '../../context/DataContext'
 import ChipInput from './ChipInput'
 import { AdminModal, ConfirmModal } from './AdminModal'
@@ -60,12 +61,16 @@ const emptyOrder = {
 
 function StatusSelect({ value, onChange }) {
   const [open, setOpen] = useState(false)
-  const ref = useRef(null)
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 })
+  const wrapRef = useRef(null)
+  const triggerRef = useRef(null)
 
   useEffect(() => {
     if (!open) return
+    const rect = triggerRef.current?.getBoundingClientRect()
+    if (rect) setDropdownPos({ top: rect.bottom + 4, left: rect.left })
     function onDown(e) {
-      if (!ref.current?.contains(e.target)) setOpen(false)
+      if (!wrapRef.current?.contains(e.target)) setOpen(false)
     }
     document.addEventListener('mousedown', onDown)
     return () => document.removeEventListener('mousedown', onDown)
@@ -74,8 +79,9 @@ function StatusSelect({ value, onChange }) {
   const cls = STATUS_CLASS[value] || 'pendiente'
 
   return (
-    <div className="status-select-wrap" ref={ref}>
+    <div className="status-select-wrap" ref={wrapRef}>
       <button
+        ref={triggerRef}
         type="button"
         className={`status-select-trigger status-trigger--${cls}`}
         onClick={() => setOpen(o => !o)}
@@ -84,8 +90,11 @@ function StatusSelect({ value, onChange }) {
         {value}
         <ChevronIcon />
       </button>
-      {open && (
-        <div className="status-select-dropdown">
+      {open && createPortal(
+        <div
+          className="status-select-dropdown"
+          style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left, zIndex: 9999 }}
+        >
           {STATUS_OPTIONS.map(opt => (
             <button
               key={opt}
@@ -97,7 +106,8 @@ function StatusSelect({ value, onChange }) {
               {opt}
             </button>
           ))}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )

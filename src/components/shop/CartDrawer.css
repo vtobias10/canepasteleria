@@ -51,8 +51,9 @@
   gap: 10px;
 }
 
-.cart-drawer-icon {
-  font-size: 1.3rem;
+.cart-drawer-title svg {
+  color: var(--lilac-deep);
+  flex-shrink: 0;
 }
 
 .cart-drawer-title h3 {
