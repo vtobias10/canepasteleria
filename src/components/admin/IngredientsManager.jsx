@@ -229,6 +229,7 @@ export default function IngredientsManager() {
             <div className="ingredient-actions">
               <button
                 className="btn btn-ghost btn-sm"
+                onMouseDown={editId === ingredient.id ? (e) => e.preventDefault() : undefined}
                 onClick={() => (editId === ingredient.id ? saveEdit(ingredient.id) : startEdit(ingredient))}
               >
                 {editId === ingredient.id ? <><CheckIcon /> Guardar</> : 'Editar'}

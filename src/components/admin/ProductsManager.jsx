@@ -20,7 +20,7 @@ const EMOJI_OPTIONS = [
   '/emojis/bomba_de_crema.png',
   '/emojis/brownie.png',
 ]
-const VARIANT_SUGGESTIONS = ['Presentacion', 'Tamano', 'Sabor', 'Relleno', 'Cobertura', 'Formato']
+const VARIANT_SUGGESTIONS = ['Presentación', 'Tamaño', 'Sabor', 'Relleno', 'Cobertura', 'Formato']
 const MAX_IMAGE_FILE_SIZE = 2 * 1024 * 1024
 const DEFAULT_EMOJI = '\u{1F382}'
 
@@ -380,7 +380,6 @@ function ProductFormModal({ initial, categories, onSave, onClose }) {
 
   function switchToEmojiMode() {
     setMediaMode('emoji')
-    set('imageUrl', '')
     if (!form.emoji) set('emoji', DEFAULT_EMOJI)
     setImageError('')
   }

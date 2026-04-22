@@ -502,14 +502,40 @@
 }
 
 @media (max-height: 820px) {
+  .shop-outer {
+    padding: 8px 18px;
+    gap: 6px;
+    justify-content: flex-start;
+  }
+
   .shop-card {
-    max-height: calc(100vh - 62px);
+    max-height: calc(100vh - 56px);
+    padding: 10px 16px 10px;
+    gap: 6px;
+  }
+
+  .shop-card-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .shop-subtitle {
+    font-size: 0.78rem;
+  }
+
+  .product-card-inner {
+    min-height: 100px;
+    padding: 8px 10px;
+  }
+
+  .product-media-frame {
+    width: 66px;
+    height: 66px;
   }
 }
 
 @media (max-width: 1366px), (max-height: 900px) {
   .product-card-inner {
-    min-height: 112px;
+    min-height: 108px;
   }
 
   .shop-card {

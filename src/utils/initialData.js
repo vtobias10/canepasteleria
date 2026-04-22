@@ -5,7 +5,7 @@ export const initialProducts = [
     description: 'Deliciosos alfajores rellenos de dulce de leche, banados en chocolate o azucar impalpable.',
     category: 'Alfajores',
     variants: [
-      { name: 'Tamano', options: ['Chico', 'Mediano', 'Grande'] },
+      { name: 'Tamaño', options: ['Chico', 'Mediano', 'Grande'] },
       { name: 'Cobertura', options: ['Chocolate', 'Azucar'] },
     ],
     bolsitasXUd: ['1', '6', '12'],
@@ -22,7 +22,7 @@ export const initialProducts = [
     description: 'Torta personalizada para tu celebracion especial, disponible en distintos sabores y decoraciones.',
     category: 'Tortas',
     variants: [
-      { name: 'Tamano', options: ['6 porciones', '10 porciones', '15 porciones'] },
+      { name: 'Tamaño', options: ['6 porciones', '10 porciones', '15 porciones'] },
       { name: 'Sabor', options: ['Vainilla', 'Chocolate', 'Lemon pie'] },
     ],
     bolsitasXUd: [],

@@ -1,7 +1,8 @@
 .login-page {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .login-container {
@@ -9,13 +10,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
+  padding: 24px 20px;
+  min-height: 0;
 }
 
 .login-card {
   width: 100%;
-  max-width: 380px;
-  padding: 40px 36px;
+  max-width: 360px;
+  padding: 32px 30px;
 }
 
 .login-brand {
@@ -135,4 +137,27 @@
   color: var(--text-dark);
   border-color: var(--lilac-deep);
   background: #fff;
+}
+
+@media (max-height: 700px) {
+  .login-card {
+    padding: 20px 26px;
+  }
+
+  .login-brand {
+    margin-bottom: 14px;
+  }
+
+  .login-icon {
+    font-size: 2rem;
+    margin-bottom: 6px;
+  }
+
+  .login-brand h2 {
+    font-size: 1.3rem;
+  }
+
+  .form-group {
+    margin-bottom: 12px;
+  }
 }

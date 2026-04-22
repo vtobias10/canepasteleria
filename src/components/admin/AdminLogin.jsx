@@ -42,8 +42,8 @@ export default function AdminLogin({ onLogin }) {
         <div className={`login-card card ${shake ? 'shake' : ''}`}>
           <div className="login-brand">
             <span className="login-icon">✿</span>
-            <h2>Cane Pasteleria</h2>
-            <p>Panel de Administracion</p>
+            <h2>Cane Pastelería</h2>
+            <p>Panel de Administración</p>
           </div>
 
           <form onSubmit={handleSubmit}>
@@ -58,7 +58,7 @@ export default function AdminLogin({ onLogin }) {
             </div>
 
             <div className="form-group">
-              <label>Contrasena</label>
+              <label>Contraseña</label>
               <div className="password-input-wrap">
                 <input
                   type={showPass ? 'text' : 'password'}
@@ -70,14 +70,14 @@ export default function AdminLogin({ onLogin }) {
                   type="button"
                   className="password-toggle-btn"
                   onClick={() => setShowPass(prev => !prev)}
-                  aria-label={showPass ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+                  aria-label={showPass ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 >
                   {showPass ? <EyeOffIcon /> : <EyeIcon />}
                 </button>
               </div>
             </div>
 
-            {error && <p className="login-error">Usuario o contrasena incorrectos</p>}
+            {error && <p className="login-error">Usuario o contraseña incorrectos</p>}
 
             <button type="submit" className="btn btn-primary login-btn">
               Ingresar
@@ -87,6 +87,7 @@ export default function AdminLogin({ onLogin }) {
               ← Volver al sitio
             </Link>
           </form>
+          <div className="hachitec-watermark">✦ Desarrollado por <strong>hachitec</strong></div>
         </div>
       </div>
     </div>
