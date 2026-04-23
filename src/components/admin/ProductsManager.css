@@ -19,6 +19,18 @@
   color: var(--text-dark);
 }
 
+.admin-product-variant-price-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.admin-product-variant-price-label {
+  font-size: 0.72rem;
+  color: var(--text-light);
+  white-space: nowrap;
+}
+
 .sort-col-head {
   width: 58px;
   text-align: center !important;

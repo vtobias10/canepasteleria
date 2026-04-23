@@ -57,20 +57,41 @@ function renderPrice(product) {
   const hasPrice = regularPrice !== null
   const hasSale = discountedPrice !== null && discountedPrice > 0
 
-  if (!hasPrice && !hasSale) {
-    return <span style={{ color: 'var(--text-light)' }}>Sin precio</span>
-  }
+  const variantPriceRows = (product.variants || []).flatMap(variant =>
+    (variant.options || []).map((option, i) => {
+      const vp = toNumberOrNull(variant.prices?.[i])
+      return vp !== null && vp > 0 ? { label: option, price: vp } : null
+    }).filter(Boolean)
+  )
 
-  if (hasPrice && hasSale && discountedPrice < regularPrice) {
-    return (
-      <div className="admin-product-price-stack">
-        <span className="admin-product-price-old">{formatMoney(regularPrice)}</span>
-        <strong className="admin-product-price-sale">{formatMoney(discountedPrice)}</strong>
-      </div>
-    )
-  }
+  const baseBlock = (() => {
+    if (!hasPrice && !hasSale) {
+      return variantPriceRows.length > 0 ? null : <span style={{ color: 'var(--text-light)' }}>Sin precio</span>
+    }
+    if (hasPrice && hasSale && discountedPrice < regularPrice) {
+      return (
+        <div className="admin-product-price-stack">
+          <span className="admin-product-price-old">{formatMoney(regularPrice)}</span>
+          <strong className="admin-product-price-sale">{formatMoney(discountedPrice)}</strong>
+        </div>
+      )
+    }
+    return <strong className="admin-product-price-sale">{formatMoney(hasSale ? discountedPrice : regularPrice)}</strong>
+  })()
 
-  return <strong className="admin-product-price-sale">{formatMoney(hasSale ? discountedPrice : regularPrice)}</strong>
+  if (variantPriceRows.length === 0) return baseBlock
+
+  return (
+    <div className="admin-product-price-stack">
+      {baseBlock}
+      {variantPriceRows.map(({ label, price }) => (
+        <span key={label} className="admin-product-variant-price-row">
+          <span className="admin-product-variant-price-label">{label}</span>
+          <strong className="admin-product-price-sale">{formatMoney(price)}</strong>
+        </span>
+      ))}
+    </div>
+  )
 }
 
 function moveIdRelative(ids, draggingId, targetId, position) {
