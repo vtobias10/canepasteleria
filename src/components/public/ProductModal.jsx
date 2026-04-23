@@ -61,6 +61,20 @@ export default function ProductModal({ product, whatsappNumber, messageTexts, on
     setSelectedVariants(prev => ({ ...prev, [variantName]: option }))
   }
 
+  const effectivePrice = useMemo(() => {
+    for (const variant of (product.variants || [])) {
+      const selectedOption = selectedVariants[variant.name]
+      if (!selectedOption) continue
+      const optIdx = (variant.options || []).indexOf(selectedOption)
+      if (optIdx === -1) continue
+      const vp = variant.prices?.[optIdx]
+      if (vp !== null && vp !== undefined && Number.isFinite(Number(vp)) && Number(vp) > 0) {
+        return { price: null, salePrice: Number(vp) }
+      }
+    }
+    return { price: product.price, salePrice: product.salePrice }
+  }, [product, selectedVariants])
+
   function decQty() {
     setQuantity(q => Math.max(minQty, q - 1))
   }
@@ -99,7 +113,7 @@ export default function ProductModal({ product, whatsappNumber, messageTexts, on
                 </span>
               )}
               <h3>{product.name}</h3>
-              <PriceBlock product={product} />
+              <PriceBlock product={effectivePrice} />
             </div>
           </div>
           <button className="modal-close" onClick={onClose}>✕</button>
@@ -182,8 +196,8 @@ export default function ProductModal({ product, whatsappNumber, messageTexts, on
                   productName: product.name,
                   emoji: product.emoji,
                   imageUrl: product.imageUrl,
-                  price: product.price,
-                  salePrice: product.salePrice,
+                  price: effectivePrice.price,
+                  salePrice: effectivePrice.salePrice,
                   quantity,
                   variantSelections: selectedVariants,
                   bolsitasXUd: selectedBolsitas,

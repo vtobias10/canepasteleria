@@ -357,7 +357,7 @@ function ProductFormModal({ initial, categories, onSave, onClose }) {
     if (!name) return
     const exists = form.variants.some(variant => variant.name?.toLowerCase() === name.toLowerCase())
     if (exists) return
-    set('variants', [...form.variants, { name, options: [] }])
+    set('variants', [...form.variants, { name, options: [], prices: [] }])
     setNewVariantName('')
   }
 
@@ -366,7 +366,21 @@ function ProductFormModal({ initial, categories, onSave, onClose }) {
   }
 
   function updateVariantOptions(index, options) {
-    set('variants', form.variants.map((variant, idx) => (idx === index ? { ...variant, options } : variant)))
+    set('variants', form.variants.map((variant, idx) => {
+      if (idx !== index) return variant
+      const prevPrices = variant.prices || []
+      const prices = options.map((_, i) => prevPrices[i] ?? null)
+      return { ...variant, options, prices }
+    }))
+  }
+
+  function updateVariantOptionPrice(variantIndex, optionIndex, value) {
+    set('variants', form.variants.map((variant, idx) => {
+      if (idx !== variantIndex) return variant
+      const prices = [...(variant.prices || [])]
+      prices[optionIndex] = value === '' ? null : Number(value)
+      return { ...variant, prices }
+    }))
   }
 
   function removeVariant(index) {
@@ -434,10 +448,14 @@ function ProductFormModal({ initial, categories, onSave, onClose }) {
     event.preventDefault()
 
     const sanitizedVariants = (form.variants || [])
-      .map(variant => ({
-        name: (variant.name || '').trim(),
-        options: (variant.options || []).map(option => option.trim()).filter(Boolean),
-      }))
+      .map(variant => {
+        const options = (variant.options || []).map(option => option.trim()).filter(Boolean)
+        const prices = options.map((_, i) => {
+          const n = Number(variant.prices?.[i])
+          return Number.isFinite(n) && n > 0 ? n : null
+        })
+        return { name: (variant.name || '').trim(), options, prices }
+      })
       .filter(variant => variant.name)
 
     const sanitizedBolsitas = (form.bolsitasXUd || []).map(value => value.trim()).filter(Boolean)
@@ -705,6 +723,25 @@ function ProductFormModal({ initial, categories, onSave, onClose }) {
                         chips={variant.options || []}
                         onChange={options => updateVariantOptions(index, options)}
                       />
+                      {variant.options?.length > 0 && (
+                        <div className="variant-option-prices">
+                          <span className="variant-option-prices-label">Precio por opción</span>
+                          {variant.options.map((option, optIdx) => (
+                            <div key={option} className="variant-option-price-row">
+                              <span className="variant-option-name">{option}</span>
+                              <input
+                                type="number"
+                                min="0"
+                                step="1"
+                                className="variant-option-price-input"
+                                placeholder="Sin precio propio"
+                                value={(variant.prices?.[optIdx] != null && variant.prices[optIdx] !== '') ? variant.prices[optIdx] : ''}
+                                onChange={e => updateVariantOptionPrice(index, optIdx, e.target.value)}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
