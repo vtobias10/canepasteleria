@@ -64,6 +64,7 @@ function StatusSelect({ value, onChange }) {
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 })
   const wrapRef = useRef(null)
   const triggerRef = useRef(null)
+  const dropdownRef = useRef(null)
 
   useEffect(() => {
     if (!open) return
@@ -78,7 +79,9 @@ function StatusSelect({ value, onChange }) {
       }
     }
     function onDown(e) {
-      if (!wrapRef.current?.contains(e.target)) setOpen(false)
+      if (!wrapRef.current?.contains(e.target) && !dropdownRef.current?.contains(e.target)) {
+        setOpen(false)
+      }
     }
     document.addEventListener('mousedown', onDown)
     return () => document.removeEventListener('mousedown', onDown)
@@ -100,6 +103,7 @@ function StatusSelect({ value, onChange }) {
       </button>
       {open && createPortal(
         <div
+          ref={dropdownRef}
           className="status-select-dropdown"
           style={{
             position: 'fixed',
@@ -493,8 +497,7 @@ function OrderFormModal({ initial, onSave, onClose }) {
                   <label>Fecha</label>
                   <input type="date" className="date-input-styled"
                     value={form.deliveryDate.value}
-                    onChange={event => set('deliveryDate', { ...form.deliveryDate, value: event.target.value })}
-                    min={new Date().toISOString().split('T')[0]} />
+                    onChange={event => set('deliveryDate', { ...form.deliveryDate, value: event.target.value })} />
                 </div>
                 {form.deliveryDate.value && (
                   <div className="form-group" style={{ marginBottom: 0 }}>
