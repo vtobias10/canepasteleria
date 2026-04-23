@@ -68,7 +68,15 @@ function StatusSelect({ value, onChange }) {
   useEffect(() => {
     if (!open) return
     const rect = triggerRef.current?.getBoundingClientRect()
-    if (rect) setDropdownPos({ top: rect.bottom + 4, left: rect.left })
+    if (rect) {
+      const DROPDOWN_H = 210
+      const spaceBelow = window.innerHeight - rect.bottom
+      if (spaceBelow < DROPDOWN_H) {
+        setDropdownPos({ bottom: window.innerHeight - rect.top + 4, left: rect.left, top: null })
+      } else {
+        setDropdownPos({ top: rect.bottom + 4, left: rect.left, bottom: null })
+      }
+    }
     function onDown(e) {
       if (!wrapRef.current?.contains(e.target)) setOpen(false)
     }
@@ -93,7 +101,13 @@ function StatusSelect({ value, onChange }) {
       {open && createPortal(
         <div
           className="status-select-dropdown"
-          style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left, zIndex: 9999 }}
+          style={{
+            position: 'fixed',
+            top: dropdownPos.top != null ? dropdownPos.top : undefined,
+            bottom: dropdownPos.bottom != null ? dropdownPos.bottom : undefined,
+            left: dropdownPos.left,
+            zIndex: 9999,
+          }}
         >
           {STATUS_OPTIONS.map(opt => (
             <button
