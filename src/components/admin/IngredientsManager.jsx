@@ -239,7 +239,7 @@ export default function IngredientsManager() {
 
       {confirmDelete && (
         <ConfirmModal
-          title="Â¿Eliminar ingrediente?"
+          title="¿Eliminar ingrediente?"
           message={(
             <>
               Se eliminara <strong>{confirmDelete.name}</strong> del inventario. Esta accion no se puede deshacer.
