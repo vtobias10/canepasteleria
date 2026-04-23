@@ -7,7 +7,7 @@ import CartDrawer from '../components/shop/CartDrawer'
 import { getEmojiText, isEmojiImage, normalizeEmojiSrc } from '../utils/emoji'
 import './ShopPage.css'
 
-const PRODUCTS_PER_PAGE = typeof window !== 'undefined' && window.matchMedia('(max-width: 700px)').matches ? 3 : 6
+const PRODUCTS_PER_PAGE = typeof window !== 'undefined' && window.matchMedia('(max-width: 700px)').matches ? 4 : 6
 const CARD_SPARKLES = [
   { left: '12%', top: '18%', delay: '0s', duration: '2.8s', size: '4px' },
   { left: '26%', top: '72%', delay: '0.45s', duration: '3.2s', size: '5px' },
