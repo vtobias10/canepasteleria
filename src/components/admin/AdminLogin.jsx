@@ -37,7 +37,6 @@ export default function AdminLogin({ onLogin }) {
 
   return (
     <div className="login-page">
-      <div className="lace-border" />
       <div className="login-container fade-up">
         <div className={`login-card card ${shake ? 'shake' : ''}`}>
           <div className="login-brand">

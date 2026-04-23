@@ -585,6 +585,23 @@
 }
 
 @media (max-width: 700px) {
+  /* Filtros en scroll horizontal para no ocupar 3 filas */
+  .order-filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    gap: 5px;
+    margin-bottom: 14px;
+  }
+
+  .order-filters .btn {
+    flex-shrink: 0;
+    font-size: 0.7rem;
+    padding: 5px 9px;
+    white-space: nowrap;
+  }
+
   .order-form-top {
     grid-template-columns: 1fr;
   }

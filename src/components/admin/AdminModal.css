@@ -273,16 +273,31 @@
     grid-template-columns: 1fr;
   }
 
+  /* Overlay baja 60px para no quedar tapado por la barra fija de 52px */
+  .admin-modal-overlay {
+    padding-top: 60px;
+    padding-bottom: 12px;
+    align-items: flex-start;
+  }
+
   .admin-modal {
     border-radius: 14px;
+    max-height: calc(100svh - 72px) !important;
+    max-height: calc(100vh - 72px) !important;
   }
 
   .admin-modal-header {
-    padding: 16px 16px 13px;
+    padding: 12px 14px 10px;
+  }
+
+  .admin-modal-heading h3 {
+    font-size: 1rem;
   }
 
   .admin-modal-body {
-    padding: 12px 14px;
+    padding: 10px 12px;
+    max-height: calc(100svh - 72px - 108px) !important;
+    max-height: calc(100vh - 72px - 108px) !important;
   }
 
   .admin-modal-footer {
@@ -290,11 +305,11 @@
     flex-wrap: wrap;
   }
 
-  .admin-modal {
-    max-height: 92vh !important;
+  .admin-modal-section {
+    padding: 10px 10px;
   }
 
-  .admin-modal-body {
-    max-height: calc(92vh - 110px) !important;
+  .admin-modal .form-group {
+    margin-bottom: 7px;
   }
 }

@@ -89,7 +89,7 @@ export default function AdminPage() {
         </nav>
 
         <div className="admin-sidebar-footer">
-          <a href="/" target="_blank" rel="noopener noreferrer" className="admin-nav-link" onClick={closeNav}>
+          <a href="/" target={window.innerWidth <= 700 ? '_self' : '_blank'} rel="noopener noreferrer" className="admin-nav-link" onClick={closeNav}>
             <span>🌐</span> Ver sitio
           </a>
           <button className="admin-nav-link logout-btn" onClick={handleLogout}>
